@@ -505,9 +505,11 @@ private final class Client {
         sendQueue.async { [weak self] in
             guard let self = self else { return }
 
-            // Prevent unbounded buffer growth during network congestion
-            if self.sendBuffer.count > 120 {
-                self.sendBuffer.removeFirst(30)
+            // Prevent P-frame reference corruption during network congestion:
+            // If queue builds up, clear pending stale frames and request fresh Keyframe re-sync
+            if self.sendBuffer.count > 40 {
+                self.sendBuffer.removeAll()
+                self.isStreaming = false
             }
 
             self.sendBuffer.append(data)

@@ -190,7 +190,7 @@ final class H264Encoder: VideoFrameConsumer {
             value: NSNumber(value: fps)
         )
 
-        let keyFrameInterval = Int(fps * 2)
+        let keyFrameInterval = Int(fps) // 1 second interval for fast motion recovery
 
         VTSessionSetProperty(
             session,
@@ -200,8 +200,8 @@ final class H264Encoder: VideoFrameConsumer {
 
         VTSessionSetProperty(
             session,
-            key: kVTCompressionPropertyKey_PrioritizeEncodingSpeedOverQuality,
-            value: kCFBooleanTrue
+            key: kVTCompressionPropertyKey_MaxKeyFrameIntervalDuration,
+            value: NSNumber(value: 1)
         )
 
         VTSessionSetProperty(
