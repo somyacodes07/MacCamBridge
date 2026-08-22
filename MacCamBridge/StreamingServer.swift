@@ -289,6 +289,10 @@ final class StreamServer: NSObject, ObservableObject, EncodedFrameSink {
 
                     client?.isConnected = true
 
+                    if let client = client {
+                        self.startReceive(for: client)
+                    }
+
                     self.updateClientCount()
 
                 case .failed(let error):
@@ -316,6 +320,24 @@ final class StreamServer: NSObject, ObservableObject, EncodedFrameSink {
         connection.start(
             queue: queue
         )
+    }
+
+    private func startReceive(for client: Client) {
+        client.connection.receiveMessage { [weak self, weak client] data, context, isComplete, error in
+            guard let self = self, let client = client else { return }
+
+            if let error = error {
+                print("Client \(client.id) receive error: \(error)")
+                self.queue.async {
+                    self.removeClient(client.id)
+                }
+                return
+            }
+
+            if client.connection.state == .ready {
+                self.startReceive(for: client)
+            }
+        }
     }
 
     private func removeClient(
