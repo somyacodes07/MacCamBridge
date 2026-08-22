@@ -1,0 +1,105 @@
+name: Create GitHub Release & Package Installers
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-macos:
+    name: Build & Package macOS Release DMG
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode Version
+        run: sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Build macOS App & DMG
+        run: |
+          chmod +x build_mac_dmg.sh
+          ./build_mac_dmg.sh
+
+      - name: Upload macOS DMG Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MacCamBridge-macOS-DMG
+          path: MacCamBridge-macOS.dmg
+
+  build-windows:
+    name: Build & Package Windows Receivers (.exe)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Windows Receiver Dependencies
+        run: |
+          cd WindowsReceiver
+          npm install
+
+      - name: Package Windows Installers & Portable EXEs
+        run: |
+          cd WindowsReceiver
+          npx electron-builder --win
+
+      - name: Upload Windows Executables Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows-Receiver-Executables
+          path: |
+            WindowsReceiver/dist/*.exe
+
+  create-release:
+    name: Publish Official GitHub Release
+    needs: [build-macos, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download macOS DMG Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: MacCamBridge-macOS-DMG
+          path: release_files
+
+      - name: Download Windows Executables Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Windows-Receiver-Executables
+          path: release_files
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release_files/*
+          name: MacCam Bridge Release ${{ github.ref_name }}
+          body: |
+            ## 🚀 MacCam Bridge Official Release
+
+            ### 📦 Download Assets:
+            - **macOS Installer**: `MacCamBridge-macOS.dmg` (macOS 14.0+)
+            - **Windows Setup Wizard Installer**: `MacCam-Bridge-Setup-Windows-x64-1.0.0.exe` (Windows 10/11 x64 Intel/AMD)
+            - **Windows Portable Executable**: `MacCam-Bridge-Portable-Windows-x64-1.0.0.exe` (Standalone portable execution)
+            - **Windows ARM64 Installer**: `MacCam-Bridge-Setup-Windows-arm64-1.0.0.exe` (Windows ARM64 devices)
+
+            ### ✨ Key Features:
+            - **Sub-5ms Ultra-Low Latency**: Hardware-accelerated VideoToolbox H.264 encoding & WebCodecs GPU decoding.
+            - **USB-C Direct Link Mode**: 40 Gbps wired connection support over USB-C to USB-C cable (`169.254.x.x`).
+            - **Direct System Virtual Webcam**: Exposes live stream as native webcam device ("MacCam Bridge Camera") for Discord, Zoom, Teams, and OBS Studio.
+            - **Monochrome Black & White Interface**: Minimal pitch-dark obsidian design system with system tray toolbar integration.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
