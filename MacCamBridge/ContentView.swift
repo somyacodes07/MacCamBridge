@@ -204,11 +204,11 @@ struct ContentView: View {
                     if camera.streamServer.isRunning {
                         HStack(spacing: 12) {
                             HStack(spacing: 6) {
-                                Image(systemName: "network")
+                                Image(systemName: "wifi")
                                     .font(.system(size: 12, weight: .bold))
                                     .foregroundColor(.white)
 
-                                Text("\(camera.streamServer.localIP):\(camera.streamServer.port)")
+                                Text("Wi-Fi: \(camera.streamServer.localIP):\(camera.streamServer.port)")
                                     .font(.system(size: 13, weight: .semibold, design: .monospaced))
                                     .foregroundColor(.white)
 
@@ -225,13 +225,41 @@ struct ContentView: View {
                                         .foregroundColor(copiedIPAlert ? .white : Color(red: 161/255, green: 161/255, blue: 170/255))
                                 }
                                 .buttonStyle(.plain)
-                                .help("Copy Server Address")
+                                .help("Copy Wi-Fi Address")
                             }
                             .padding(.horizontal, 10)
                             .padding(.vertical, 6)
                             .background(Color(red: 24/255, green: 24/255, blue: 27/255))
                             .clipShape(RoundedRectangle(cornerRadius: 8))
                             .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.1), lineWidth: 1))
+
+                            if !camera.streamServer.usbIP.isEmpty {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "cable.connector")
+                                        .font(.system(size: 12, weight: .bold))
+                                        .foregroundColor(.white)
+
+                                    Text("USB-C: \(camera.streamServer.usbIP):\(camera.streamServer.port)")
+                                        .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                                        .foregroundColor(.white)
+
+                                    Button(action: {
+                                        NSPasteboard.general.clearContents()
+                                        NSPasteboard.general.setString("\(camera.streamServer.usbIP):\(camera.streamServer.port)", forType: .string)
+                                    }) {
+                                        Image(systemName: "doc.on.doc")
+                                            .font(.system(size: 11, weight: .semibold))
+                                            .foregroundColor(Color(red: 161/255, green: 161/255, blue: 170/255))
+                                    }
+                                    .buttonStyle(.plain)
+                                    .help("Copy USB-C Wired Address")
+                                }
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 6)
+                                .background(Color(red: 24/255, green: 24/255, blue: 27/255))
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.1), lineWidth: 1))
+                            }
 
                             HStack(spacing: 6) {
                                 Image(systemName: "person.2.fill")

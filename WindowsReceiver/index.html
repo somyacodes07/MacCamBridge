@@ -690,6 +690,19 @@
         <!-- Receiver Mode Panel -->
         <div id="receiverPanel">
             <div class="control-panel">
+                <!-- Connection Transport Mode Selector -->
+                <div style="display: flex; gap: 8px; margin-bottom: 12px; background: rgba(255,255,255,0.03); padding: 4px; border-radius: 8px; border: 1px solid var(--border-glass);">
+                    <button class="btn btn-secondary" id="transportWifiBtn" style="flex: 1; font-size: 11px; padding: 6px 10px; border: none; background: #ffffff; color: #000000; font-weight: 700;" onclick="setTransportMode('wifi')">
+                        Wi-Fi Wireless Mode
+                    </button>
+                    <button class="btn btn-secondary" id="transportUsbBtn" style="flex: 1; font-size: 11px; padding: 6px 10px; border: none; background: transparent; color: var(--text-muted); font-weight: 600;" onclick="setTransportMode('usb')">
+                        USB-C Cable Mode (Sub-5ms Latency)
+                    </button>
+                </div>
+                <div id="transportHint" style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px; padding: 0 2px;">
+                    Wireless connection over local Wi-Fi router subnet (192.168.x.x)
+                </div>
+
                 <div class="inputs-container">
                     <div class="input-field-group">
                         <span class="input-label">MacBook IP Address</span>
@@ -881,6 +894,37 @@
         function minWindow() { if (ipcRenderer) ipcRenderer.send('window-minimize'); }
         function maxWindow() { if (ipcRenderer) ipcRenderer.send('window-maximize'); }
         function closeWindow() { if (ipcRenderer) ipcRenderer.send('window-close'); }
+
+        function setTransportMode(type) {
+            const wifiBtn = document.getElementById('transportWifiBtn');
+            const usbBtn = document.getElementById('transportUsbBtn');
+            const hint = document.getElementById('transportHint');
+            const ipInput = document.getElementById('macIp');
+
+            if (type === 'usb') {
+                wifiBtn.style.background = 'transparent';
+                wifiBtn.style.color = 'var(--text-muted)';
+                wifiBtn.style.fontWeight = '600';
+                usbBtn.style.background = '#ffffff';
+                usbBtn.style.color = '#000000';
+                usbBtn.style.fontWeight = '700';
+                hint.innerHTML = '<b>USB-C Cable Mode:</b> Connect USB-C cable between MacBook & PC. Enter link-local IP (e.g. <code>169.254.x.x</code>) or click <b>Scan LAN</b>.';
+                if (ipInput.value.startsWith('192.168.')) {
+                    ipInput.value = '169.254.88.12';
+                }
+            } else {
+                usbBtn.style.background = 'transparent';
+                usbBtn.style.color = 'var(--text-muted)';
+                usbBtn.style.fontWeight = '600';
+                wifiBtn.style.background = '#ffffff';
+                wifiBtn.style.color = '#000000';
+                wifiBtn.style.fontWeight = '700';
+                hint.innerHTML = 'Wireless connection over local Wi-Fi router subnet (192.168.x.x)';
+                if (ipInput.value.startsWith('169.254.')) {
+                    ipInput.value = '192.168.1.45';
+                }
+            }
+        }
 
         function switchMode(mode) {
             currentMode = mode;

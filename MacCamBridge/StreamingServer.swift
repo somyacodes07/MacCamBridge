@@ -8,6 +8,7 @@ final class StreamServer: NSObject, ObservableObject, EncodedFrameSink {
     @Published private(set) var port: UInt16 = 8080
     @Published private(set) var clientCount = 0
     @Published private(set) var localIP: String = "127.0.0.1"
+    @Published private(set) var usbIP: String = ""
 
     private let queue = DispatchQueue(
         label: "com.maccambridge.stream.server"
@@ -22,11 +23,12 @@ final class StreamServer: NSObject, ObservableObject, EncodedFrameSink {
 
     private var frameCount = 0
 
-    static func getLocalIPAddress() -> String {
-        var address = "127.0.0.1"
+    static func getAllLocalIPAddresses() -> (wifi: String, usb: String) {
+        var wifiIP = "127.0.0.1"
+        var usbIP = ""
         var ifaddr: UnsafeMutablePointer<ifaddrs>?
         guard getifaddrs(&ifaddr) == 0, let firstAddr = ifaddr else {
-            return address
+            return (wifiIP, usbIP)
         }
         for ptr in sequence(first: firstAddr, next: { $0.pointee.ifa_next }) {
             let flags = Int32(ptr.pointee.ifa_flags)
@@ -36,16 +38,17 @@ final class StreamServer: NSObject, ObservableObject, EncodedFrameSink {
                     var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
                     if getnameinfo(ptr.pointee.ifa_addr, socklen_t(addr.sa_len), &hostname, socklen_t(hostname.count), nil, 0, NI_NUMERICHOST) == 0 {
                         let ip = String(cString: hostname)
-                        if !ip.hasPrefix("127.") {
-                            address = ip
-                            break
+                        if ip.hasPrefix("169.254.") {
+                            usbIP = ip
+                        } else if !ip.hasPrefix("127.") {
+                            wifiIP = ip
                         }
                     }
                 }
             }
         }
         freeifaddrs(ifaddr)
-        return address
+        return (wifiIP, usbIP)
     }
 
     func start(
@@ -222,17 +225,18 @@ final class StreamServer: NSObject, ObservableObject, EncodedFrameSink {
             let actualPort =
                 listener?.port?.rawValue ?? 8080
 
-            let ip = StreamServer.getLocalIPAddress()
+            let (wifi, usb) = StreamServer.getAllLocalIPAddresses()
 
             DispatchQueue.main.async {
 
                 self.port = actualPort
-                self.localIP = ip
+                self.localIP = wifi
+                self.usbIP = usb
                 self.isRunning = true
             }
 
             print(
-                "Stream server running on \(ip):\(actualPort)"
+                "Stream server running on Wi-Fi: \(wifi):\(actualPort), USB-C: \(usb):\(actualPort)"
             )
 
         case .failed(let error):
