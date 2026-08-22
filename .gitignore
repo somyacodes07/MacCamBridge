@@ -34,3 +34,9 @@ yarn-error.log*
 *.tmp
 *.log
 MacCamBridge.xcodeproj/
+
+# Build outputs
+build_dmg/
+dist/
+*.dmg
+*.exe

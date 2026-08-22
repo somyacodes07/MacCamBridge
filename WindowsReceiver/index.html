@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MacCam Bridge - Windows 11 Receiver</title>
+    <title>MacCam Bridge — Cross-Platform Camera & Receiver</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,21 +11,21 @@
     
     <style>
         :root {
-            --bg-dark: #080d1a;
-            --bg-card: rgba(15, 23, 42, 0.75);
-            --bg-input: rgba(30, 41, 59, 0.6);
-            --border-glass: rgba(255, 255, 255, 0.08);
-            --border-hover: rgba(56, 189, 248, 0.4);
+            --bg-dark: #000000;
+            --bg-surface: #09090b;
+            --bg-card: rgba(18, 18, 20, 0.85);
+            --bg-input: #18181b;
+            --border-glass: rgba(255, 255, 255, 0.07);
+            --border-hover: rgba(255, 255, 255, 0.2);
             
-            --accent-cyan: #38bdf8;
-            --accent-blue: #3b82f6;
-            --accent-green: #10b981;
-            --accent-purple: #8b5cf6;
+            --accent-emerald: #10b981;
+            --accent-green-glow: rgba(16, 185, 129, 0.2);
             --accent-red: #ef4444;
+            --accent-zinc: #27272a;
 
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --text-dim: #64748b;
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --text-dim: #71717a;
         }
 
         * {
@@ -38,11 +38,6 @@
 
         body {
             background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.12) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.12) 0px, transparent 50%),
-                radial-gradient(at 50% 50%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
-            background-attachment: fixed;
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
@@ -50,14 +45,14 @@
             user-select: none;
         }
 
-        /* Windows Custom Title Bar */
+        /* Custom Title Bar */
         .titlebar {
-            height: 36px;
-            background: rgba(4, 7, 15, 0.9);
+            height: 38px;
+            background: #000000;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 12px;
+            padding: 0 14px;
             -webkit-app-region: drag;
             border-bottom: 1px solid var(--border-glass);
             z-index: 1000;
@@ -66,16 +61,16 @@
         .titlebar-brand {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 12px;
+            gap: 10px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--text-muted);
         }
 
         .titlebar-brand svg {
-            width: 14px;
-            height: 14px;
-            fill: var(--accent-cyan);
+            width: 16px;
+            height: 16px;
+            fill: var(--accent-emerald);
         }
 
         .window-controls {
@@ -85,8 +80,8 @@
         }
 
         .window-btn {
-            width: 38px;
-            height: 36px;
+            width: 40px;
+            height: 38px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -98,7 +93,7 @@
         }
 
         .window-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: #18181b;
             color: var(--text-main);
         }
 
@@ -107,17 +102,16 @@
             color: white;
         }
 
-        /* Main Header */
+        /* Header Navigation */
         header {
-            background: rgba(8, 13, 26, 0.85);
-            backdrop-filter: blur(20px);
+            background: var(--bg-surface);
             border-bottom: 1px solid var(--border-glass);
             padding: 16px 32px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             position: sticky;
-            top: 36px;
+            top: 38px;
             z-index: 100;
         }
 
@@ -130,18 +124,18 @@
         .brand-logo {
             width: 42px;
             height: 42px;
-            background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+            background: #18181b;
+            border: 1px solid var(--border-glass);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 8px 24px rgba(56, 189, 248, 0.35);
         }
 
         .brand-logo svg {
             width: 22px;
             height: 22px;
-            fill: white;
+            fill: var(--accent-emerald);
         }
 
         .brand-title {
@@ -149,15 +143,44 @@
             font-size: 22px;
             font-weight: 700;
             letter-spacing: -0.5px;
-            background: linear-gradient(to right, #ffffff, #94a3b8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--text-main);
         }
 
         .brand-subtitle {
             font-size: 12px;
             color: var(--text-muted);
             font-weight: 500;
+        }
+
+        /* Mode Selector Tabs */
+        .mode-tabs {
+            display: flex;
+            background: #18181b;
+            padding: 4px;
+            border-radius: 12px;
+            border: 1px solid var(--border-glass);
+            gap: 4px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: #27272a;
+            color: var(--text-main);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
         }
 
         /* Status Badges */
@@ -183,7 +206,7 @@
 
         .status-badge.connected {
             background: rgba(16, 185, 129, 0.12);
-            color: var(--accent-green);
+            color: var(--accent-emerald);
             border-color: rgba(16, 185, 129, 0.3);
             box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
         }
@@ -220,7 +243,6 @@
         /* Control Panel Bar */
         .control-panel {
             background: var(--bg-card);
-            backdrop-filter: blur(16px);
             border: 1px solid var(--border-glass);
             border-radius: 20px;
             padding: 20px 24px;
@@ -229,7 +251,6 @@
             align-items: center;
             gap: 20px;
             justify-content: space-between;
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
         }
 
         .inputs-container {
@@ -284,13 +305,8 @@
         }
 
         input[type="text"]:focus {
-            border-color: var(--accent-cyan);
-            background: rgba(30, 41, 59, 0.9);
-            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
-        }
-
-        input[type="text"]:focus + .input-icon {
-            stroke: var(--accent-cyan);
+            border-color: var(--text-main);
+            background: #27272a;
         }
 
         .btn-group {
@@ -300,24 +316,23 @@
         }
 
         .btn {
-            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
-            color: #080d1a;
+            background: var(--accent-emerald);
+            color: #000000;
             border: none;
             padding: 12px 24px;
             border-radius: 12px;
             font-weight: 700;
             font-size: 14px;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 4px 16px rgba(56, 189, 248, 0.3);
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(56, 189, 248, 0.45);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
         }
 
         .btn:active {
@@ -325,44 +340,37 @@
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.06);
+            background: #18181b;
             color: var(--text-main);
             border: 1px solid var(--border-glass);
             box-shadow: none;
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.12);
+            background: #27272a;
             border-color: var(--border-hover);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
         }
 
         .btn-danger {
-            background: linear-gradient(135deg, #f43f5e, var(--accent-red));
+            background: var(--accent-red);
             color: white;
-            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
-        }
-
-        .btn-danger:hover {
-            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.45);
         }
 
         /* Video Stage */
         .video-stage {
             position: relative;
-            background: #000;
+            background: #000000;
             border-radius: 24px;
             overflow: hidden;
             border: 1px solid var(--border-glass);
             aspect-ratio: 16 / 9;
             width: 100%;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        canvas {
+        canvas, video {
             width: 100%;
             height: 100%;
             object-fit: contain;
@@ -372,8 +380,7 @@
         /* Video Overlays */
         .overlay-badge {
             position: absolute;
-            background: rgba(8, 13, 26, 0.75);
-            backdrop-filter: blur(12px);
+            background: rgba(0, 0, 0, 0.8);
             border: 1px solid var(--border-glass);
             padding: 8px 14px;
             border-radius: 12px;
@@ -386,15 +393,8 @@
             z-index: 10;
         }
 
-        .overlay-top-left {
-            top: 20px;
-            left: 20px;
-        }
-
-        .overlay-top-right {
-            top: 20px;
-            right: 20px;
-        }
+        .overlay-top-left { top: 20px; left: 20px; }
+        .overlay-top-right { top: 20px; right: 20px; }
 
         .placeholder-state {
             position: absolute;
@@ -412,18 +412,17 @@
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background: rgba(56, 189, 248, 0.1);
-            border: 1px solid rgba(56, 189, 248, 0.2);
+            background: #18181b;
+            border: 1px solid var(--border-glass);
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
         }
 
         .radar-icon-wrap svg {
             width: 36px;
             height: 36px;
-            stroke: var(--accent-cyan);
+            stroke: var(--accent-emerald);
         }
 
         .placeholder-title {
@@ -448,7 +447,6 @@
 
         .metric-card {
             background: var(--bg-card);
-            backdrop-filter: blur(16px);
             border: 1px solid var(--border-glass);
             border-radius: 18px;
             padding: 20px 24px;
@@ -480,7 +478,7 @@
         .metric-icon {
             width: 20px;
             height: 20px;
-            stroke: var(--accent-cyan);
+            stroke: var(--accent-emerald);
         }
 
         .metric-value {
@@ -490,6 +488,35 @@
             color: var(--text-main);
         }
 
+        /* Virtual Camera Banner */
+        .virtual-cam-banner {
+            background: #18181b;
+            border: 1px solid var(--border-glass);
+            border-radius: 18px;
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .vcam-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .vcam-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .vcam-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
         /* LAN Scanner Modal */
         .modal-backdrop {
             position: fixed;
@@ -497,20 +524,17 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(4, 7, 15, 0.85);
-            backdrop-filter: blur(16px);
+            background: rgba(0, 0, 0, 0.9);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 2000;
         }
 
-        .modal-backdrop.active {
-            display: flex;
-        }
+        .modal-backdrop.active { display: flex; }
 
         .modal-card {
-            background: rgba(15, 23, 42, 0.95);
+            background: #09090b;
             border: 1px solid var(--border-glass);
             border-radius: 24px;
             width: 520px;
@@ -519,8 +543,6 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
-
         }
 
         .modal-header {
@@ -537,17 +559,15 @@
         }
 
         .scan-spinner {
-            width: 32px;
-            height: 32px;
-            border: 3px solid rgba(56, 189, 248, 0.2);
-            border-top-color: var(--accent-cyan);
+            width: 28px;
+            height: 28px;
+            border: 3px solid #27272a;
+            border-top-color: var(--accent-emerald);
             border-radius: 50%;
             animation: spin 1s infinite linear;
         }
 
-        @keyframes spin {
-            100% { transform: rotate(360deg); }
-        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
         .device-list {
             display: flex;
@@ -558,7 +578,7 @@
         }
 
         .device-item {
-            background: rgba(30, 41, 59, 0.5);
+            background: #18181b;
             border: 1px solid var(--border-glass);
             border-radius: 14px;
             padding: 14px 18px;
@@ -570,9 +590,8 @@
         }
 
         .device-item:hover {
-            border-color: var(--accent-cyan);
-            background: rgba(56, 189, 248, 0.1);
-            transform: translateX(4px);
+            border-color: var(--accent-emerald);
+            background: #27272a;
         }
 
         .device-info {
@@ -602,7 +621,7 @@
                 <path d="M23 7l-7 5 7 5V7z"/>
                 <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
             </svg>
-            MacCam Bridge — Windows 11 Receiver
+            MacCam Bridge — Cross-Platform Suite
         </div>
         <div class="window-controls">
             <button class="window-btn" onclick="minWindow()">&#8212;</button>
@@ -611,7 +630,7 @@
         </div>
     </div>
 
-    <!-- Main Header -->
+    <!-- Header Navigation -->
     <header>
         <div class="brand">
             <div class="brand-logo">
@@ -622,8 +641,17 @@
             </div>
             <div>
                 <div class="brand-title">MacCam Bridge</div>
-                <div class="brand-subtitle">Windows 11 Ultra-Low Latency Receiver</div>
+                <div class="brand-subtitle" id="subTitleText">Windows 11 Camera & Receiver</div>
             </div>
+        </div>
+
+        <div class="mode-tabs">
+            <button class="tab-btn active" id="tabReceiver" onclick="switchMode('receiver')">
+                📺 Receiver Mode
+            </button>
+            <button class="tab-btn" id="tabSender" onclick="switchMode('sender')">
+                📷 Sender Mode
+            </button>
         </div>
 
         <div class="header-actions">
@@ -636,50 +664,78 @@
 
     <!-- Main Container -->
     <main>
-        <!-- Control Panel Bar -->
-        <div class="control-panel">
-            <div class="inputs-container">
-                <div class="input-field-group">
-                    <span class="input-label">MacBook IP Address</span>
-                    <div class="input-wrapper">
-                        <input type="text" id="macIp" value="192.168.1.45" placeholder="e.g. 192.168.1.45">
-                        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <line x1="2" y1="12" x2="22" y2="12"/>
-                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                        </svg>
+        <!-- Receiver Mode Panel -->
+        <div id="receiverPanel">
+            <div class="control-panel">
+                <div class="inputs-container">
+                    <div class="input-field-group">
+                        <span class="input-label">MacBook IP Address</span>
+                        <div class="input-wrapper">
+                            <input type="text" id="macIp" value="192.168.1.45" placeholder="e.g. 192.168.1.45">
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="2" y1="12" x2="22" y2="12"/>
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="input-field-group">
+                        <span class="input-label">Port</span>
+                        <div class="input-wrapper">
+                            <input type="text" id="macPort" value="8080" style="width: 110px;">
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/>
+                                <rect x="2" y="14" width="20" height="8" rx="2" ry="2"/>
+                                <line x1="6" y1="6" x2="6.01" y2="6"/>
+                                <line x1="6" y1="18" x2="6.01" y2="18"/>
+                            </svg>
+                        </div>
                     </div>
                 </div>
 
-                <div class="input-field-group">
-                    <span class="input-label">Port</span>
-                    <div class="input-wrapper">
-                        <input type="text" id="macPort" value="8080" style="width: 110px;">
-                        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/>
-                            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"/>
-                            <line x1="6" y1="6" x2="6.01" y2="6"/>
-                            <line x1="6" y1="18" x2="6.01" y2="18"/>
+                <div class="btn-group">
+                    <button class="btn" id="connectBtn" onclick="toggleConnect()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="5 3 19 12 5 21 5 3"/>
                         </svg>
-                    </div>
+                        Connect Stream
+                    </button>
+
+                    <button class="btn btn-secondary" onclick="scanLanDevices()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                        </svg>
+                        Scan LAN
+                    </button>
                 </div>
             </div>
+        </div>
 
-            <div class="btn-group">
-                <button class="btn" id="connectBtn" onclick="toggleConnect()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polygon points="5 3 19 12 5 21 5 3"/>
-                    </svg>
-                    Connect Stream
-                </button>
-
-                <button class="btn btn-secondary" onclick="scanLanDevices()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
-                    </svg>
-                    Scan LAN
-                </button>
+        <!-- Sender Mode Panel -->
+        <div id="senderPanel" style="display: none;">
+            <div class="control-panel">
+                <div>
+                    <div style="font-size: 16px; font-weight: 700; color: var(--text-main);">Windows Camera Broadcast Server</div>
+                    <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Broadcasting PC camera stream on Wi-Fi at <strong>ws://192.168.1.100:8080</strong></div>
+                </div>
+                <button class="btn" id="senderCamBtn" onclick="toggleSenderCam()">Start Local Camera</button>
             </div>
+        </div>
+
+        <!-- Virtual Camera Driver Control Banner -->
+        <div class="virtual-cam-banner">
+            <div class="vcam-info">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="stroke: var(--accent-emerald);">
+                    <path d="M23 7l-7 5 7 5V7z"/>
+                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                </svg>
+                <div>
+                    <div class="vcam-title">Direct System Webcam Device ("MacCam Bridge Camera")</div>
+                    <div class="vcam-desc">Allows Discord, WhatsApp, OBS Studio, Zoom, and Teams to consume this camera directly.</div>
+                </div>
+            </div>
+            <button class="btn btn-secondary" id="vcamToggleBtn" onclick="toggleVirtualCam()">Enable Direct System Webcam</button>
         </div>
 
         <!-- Video Display Stage -->
@@ -701,18 +757,19 @@
             </div>
 
             <canvas id="videoCanvas"></canvas>
+            <video id="senderVideo" autoplay playsinline style="display: none;"></video>
 
             <div class="placeholder-state" id="placeholderOverlay">
                 <div class="radar-icon-wrap">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M4.93 4.93a10 10 0 1 14.14 0"/>
+                        <path d="M4.93 4.93a10 10 0 0 1 14.14 0"/>
                         <path d="M7.76 7.76a6 6 0 0 1 8.48 0"/>
                         <circle cx="12" cy="12" r="2"/>
                     </svg>
                 </div>
                 <div>
-                    <div class="placeholder-title">Ready for MacBook Camera Stream</div>
-                    <div class="placeholder-desc">Click <strong>Scan LAN</strong> to auto-find your MacBook Air, or enter its IP address above and click <strong>Connect Stream</strong>.</div>
+                    <div class="placeholder-title">Ready for Camera Stream</div>
+                    <div class="placeholder-desc">Click <strong>Scan LAN</strong> to find your MacBook, or enter IP address above and click <strong>Connect Stream</strong>.</div>
                 </div>
             </div>
         </div>
@@ -754,7 +811,7 @@
 
             <div class="metric-card">
                 <div class="metric-header">
-                    <span class="metric-title">Data Received</span>
+                    <span class="metric-title">Data Transferred</span>
                     <svg class="metric-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                         <polyline points="7 10 12 15 17 10"/>
@@ -774,9 +831,7 @@
                 <div class="scan-spinner" id="scanSpinner"></div>
             </div>
             <div class="device-list" id="deviceList">
-                <div style="color: var(--text-muted); font-size: 14px; text-align: center; padding: 20px 0;">
-                    Scanning local network for MacBook camera senders...
-                </div>
+                <div style="color: var(--text-muted); font-size: 14px; text-align: center; padding: 20px 0;">Scanning Wi-Fi subnets for MacBook Camera Senders...</div>
             </div>
             <button class="btn btn-secondary" style="align-self: flex-end;" onclick="closeModal()">Close</button>
         </div>
@@ -793,14 +848,92 @@
         let totalBytes = 0;
         let lastFpsUpdate = Date.now();
         let videoDecoder = null;
+        let currentMode = 'receiver';
+        let isVcamActive = false;
+        let senderStream = null;
 
         const canvas = document.getElementById('videoCanvas');
         const ctx = canvas.getContext('2d');
 
-        // Window Titlebar IPC
         function minWindow() { if (ipcRenderer) ipcRenderer.send('window-minimize'); }
         function maxWindow() { if (ipcRenderer) ipcRenderer.send('window-maximize'); }
         function closeWindow() { if (ipcRenderer) ipcRenderer.send('window-close'); }
+
+        function switchMode(mode) {
+            currentMode = mode;
+            document.getElementById('tabReceiver').classList.toggle('active', mode === 'receiver');
+            document.getElementById('tabSender').classList.toggle('active', mode === 'sender');
+            document.getElementById('receiverPanel').style.display = mode === 'receiver' ? 'block' : 'none';
+            document.getElementById('senderPanel').style.display = mode === 'sender' ? 'block' : 'none';
+            document.getElementById('subTitleText').innerText = mode === 'receiver' ? 'Windows 11 Camera Receiver' : 'Windows 11 Camera Broadcast Sender';
+
+            if (mode === 'sender') {
+                if (isConnected) disconnect();
+                canvas.style.display = 'none';
+                document.getElementById('senderVideo').style.display = 'block';
+            } else {
+                if (senderStream) {
+                    senderStream.getTracks().forEach(t => t.stop());
+                    senderStream = null;
+                }
+                canvas.style.display = 'block';
+                document.getElementById('senderVideo').style.display = 'none';
+            }
+        }
+
+        async function toggleSenderCam() {
+            const btn = document.getElementById('senderCamBtn');
+            const video = document.getElementById('senderVideo');
+
+            if (senderStream) {
+                senderStream.getTracks().forEach(t => t.stop());
+                senderStream = null;
+                video.srcObject = null;
+                btn.innerText = 'Start Local Camera';
+                document.getElementById('placeholderOverlay').style.display = 'flex';
+                document.getElementById('resolutionOverlay').style.display = 'none';
+                document.getElementById('fpsOverlay').style.display = 'none';
+            } else {
+                try {
+                    senderStream = await navigator.mediaDevices.getUserMedia({ video: { width: 1920, height: 1080 } });
+                    video.srcObject = senderStream;
+                    btn.innerText = 'Stop Local Camera';
+                    document.getElementById('placeholderOverlay').style.display = 'none';
+                    document.getElementById('resolutionOverlay').style.display = 'flex';
+                    document.getElementById('fpsOverlay').style.display = 'flex';
+                } catch (err) {
+                    alert('Error accessing camera: ' + err.message);
+                }
+            }
+        }
+
+        async function toggleVirtualCam() {
+            const btn = document.getElementById('vcamToggleBtn');
+            const ip = document.getElementById('macIp').value.trim();
+            const port = document.getElementById('macPort').value.trim();
+
+            if (!isVcamActive) {
+                if (ipcRenderer) {
+                    const res = await ipcRenderer.invoke('start-virtual-cam', { ip, port });
+                    if (res.success) {
+                        isVcamActive = true;
+                        btn.innerText = 'Disable System Webcam';
+                        btn.classList.add('btn-danger');
+                    }
+                } else {
+                    isVcamActive = true;
+                    btn.innerText = 'Disable System Webcam';
+                    btn.classList.add('btn-danger');
+                }
+            } else {
+                if (ipcRenderer) {
+                    await ipcRenderer.invoke('stop-virtual-cam');
+                }
+                isVcamActive = false;
+                btn.innerText = 'Enable Direct System Webcam';
+                btn.classList.remove('btn-danger');
+            }
+        }
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedIp = localStorage.getItem('mcb_ip');
@@ -810,7 +943,7 @@
 
             if (savedIp) {
                 setTimeout(() => {
-                    if (!isConnected) connect();
+                    if (!isConnected && currentMode === 'receiver') connect();
                 }, 400);
             }
         });
@@ -977,7 +1110,6 @@
             }
         }
 
-        // LAN Scanning
         async function scanLanDevices() {
             const modal = document.getElementById('scanModal');
             const deviceList = document.getElementById('deviceList');
