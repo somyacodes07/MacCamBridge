@@ -64,38 +64,6 @@ final class H264Encoder: VideoFrameConsumer {
         print("H264 encoder stopped")
     }
 
-    private let ciContext = CIContext(options: [.useSoftwareRenderer: false])
-    private var rotationPool: CVPixelBufferPool?
-
-    private func rotateToLandscape(_ inputBuffer: CVPixelBuffer) -> CVPixelBuffer {
-        let inputW = CVPixelBufferGetWidth(inputBuffer)
-        let inputH = CVPixelBufferGetHeight(inputBuffer)
-
-        guard inputW < inputH else { return inputBuffer }
-
-        if rotationPool == nil {
-            let poolAttributes: [String: Any] = [
-                kCVPixelBufferPoolMinimumBufferCountKey as String: 4
-            ]
-            let bufferAttributes: [String: Any] = [
-                kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange,
-                kCVPixelBufferWidthKey as String: inputH,
-                kCVPixelBufferHeightKey as String: inputW,
-                kCVPixelBufferIOSurfacePropertiesKey as String: [:]
-            ]
-            CVPixelBufferPoolCreate(kCFAllocatorDefault, poolAttributes as CFDictionary, bufferAttributes as CFDictionary, &rotationPool)
-        }
-
-        guard let pool = rotationPool else { return inputBuffer }
-        var outputBuffer: CVPixelBuffer?
-        CVPixelBufferPoolCreatePixelBuffer(kCFAllocatorDefault, pool, &outputBuffer)
-        guard let output = outputBuffer else { return inputBuffer }
-
-        let ciImage = CIImage(cvPixelBuffer: inputBuffer).oriented(.right)
-        ciContext.render(ciImage, to: output)
-        return output
-    }
-
     func encode(
         pixelBuffer: CVPixelBuffer,
         pts: CMTime
@@ -104,13 +72,11 @@ final class H264Encoder: VideoFrameConsumer {
             return
         }
 
-        let bufferToEncode = rotateToLandscape(pixelBuffer)
-
         var flags = VTEncodeInfoFlags()
 
         let status = VTCompressionSessionEncodeFrame(
             session,
-            imageBuffer: bufferToEncode,
+            imageBuffer: pixelBuffer,
             presentationTimeStamp: pts,
             duration: .invalid,
             frameProperties: nil,
