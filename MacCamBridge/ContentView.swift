@@ -31,14 +31,14 @@ struct ContentView: View {
             // Header Bar
             headerBar
 
-            // Main View Content
+            // Main Content Body
             if selectedMode == .sender {
                 senderView
             } else {
                 receiverView
             }
         }
-        .background(Color(red: 12/255, green: 12/255, blue: 14/255))
+        .background(Color.black)
         .frame(minWidth: 840, minHeight: 620)
         .onAppear {
             bonjour.startBrowsing()
@@ -48,50 +48,49 @@ struct ContentView: View {
         }
     }
 
-    // MARK: - Header Bar
+    // MARK: - Header Bar (Monochrome Black & White)
 
     private var headerBar: some View {
         HStack(spacing: 16) {
             HStack(spacing: 12) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 10)
-                        .fill(LinearGradient(
-                            colors: [Color(red: 16/255, green: 185/255, blue: 129/255), Color(red: 5/255, green: 150/255, blue: 105/255)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ))
-                        .frame(width: 36, height: 36)
+                        .fill(Color(red: 24/255, green: 24/255, blue: 27/255))
+                        .frame(width: 38, height: 38)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color.white.opacity(0.12), lineWidth: 1)
+                        )
 
                     Image(systemName: "video.fill")
-                        .font(.system(size: 18, weight: .bold))
+                        .font(.system(size: 17, weight: .bold))
                         .foregroundColor(.white)
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("MacCam Bridge")
-                        .font(.headline)
-                        .fontWeight(.bold)
+                        .font(.system(size: 15, weight: .bold))
                         .foregroundColor(.white)
 
                     Text(selectedMode == .sender ? "macOS Camera Broadcast Sender" : "macOS Camera Stream Receiver")
-                        .font(.caption)
-                        .foregroundColor(Color.gray)
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(Color(red: 161/255, green: 161/255, blue: 170/255))
                 }
             }
 
             Spacer()
 
-            // Custom Segmented Mode Selector (No Emoji & No Label Wrapping Bug)
+            // Custom Segmented Mode Selector (Monochrome Pill Navigation)
             HStack(spacing: 4) {
                 ForEach(AppMode.allCases) { mode in
                     Button(action: {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                        withAnimation(.spring(response: 0.25, dampingFraction: 0.75)) {
                             selectedMode = mode
                         }
                     }) {
                         HStack(spacing: 6) {
                             Image(systemName: mode.iconName)
-                                .font(.system(size: 13, weight: .semibold))
+                                .font(.system(size: 12, weight: .semibold))
 
                             Text(mode.rawValue)
                                 .font(.system(size: 13, weight: .medium))
@@ -100,64 +99,64 @@ struct ContentView: View {
                         .padding(.vertical, 7)
                         .background(
                             selectedMode == mode ?
-                            Color(red: 39/255, green: 39/255, blue: 42/255) :
+                            Color.white :
                             Color.clear
                         )
-                        .foregroundColor(selectedMode == mode ? .white : Color.gray)
+                        .foregroundColor(selectedMode == mode ? .black : Color(red: 161/255, green: 161/255, blue: 170/255))
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                     .buttonStyle(.plain)
                 }
             }
             .padding(4)
-            .background(Color(red: 24/255, green: 24/255, blue: 27/255))
+            .background(Color(red: 18/255, green: 18/255, blue: 20/255))
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.white.opacity(0.08), lineWidth: 1)
+                    .stroke(Color.white.opacity(0.1), lineWidth: 1)
             )
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 14)
-        .background(Color(red: 18/255, green: 18/255, blue: 20/255))
+        .background(Color(red: 9/255, green: 9/255, blue: 11/255))
         .border(width: 1, edges: [.bottom], color: Color.white.opacity(0.08))
     }
 
-    // MARK: - Sender View
+    // MARK: - Sender View (Monochrome Black & White)
 
     private var senderView: some View {
         VStack(spacing: 16) {
-            // Live Preview Card
+            // Live Preview Container
             ZStack {
                 CameraPreview(session: camera.session)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                            .stroke(Color.white.opacity(0.12), lineWidth: 1)
                     )
 
                 if !camera.isRunning {
                     VStack(spacing: 14) {
                         ZStack {
                             Circle()
-                                .fill(Color.white.opacity(0.05))
+                                .fill(Color.white.opacity(0.04))
                                 .frame(width: 80, height: 80)
+                                .overlay(Circle().stroke(Color.white.opacity(0.08), lineWidth: 1))
 
                             Image(systemName: "video.slash.fill")
-                                .font(.system(size: 36))
-                                .foregroundColor(Color.gray)
+                                .font(.system(size: 34))
+                                .foregroundColor(Color(red: 113/255, green: 113/255, blue: 122/255))
                         }
 
                         VStack(spacing: 4) {
                             Text("Camera Broadcast Off")
-                                .font(.title3)
-                                .fontWeight(.bold)
+                                .font(.system(size: 17, weight: .bold))
                                 .foregroundColor(.white)
 
-                            Text("Click 'Start Camera' below to broadcast 1080p stream over network")
-                                .font(.caption)
-                                .foregroundColor(Color.gray)
+                            Text("Click 'Start Camera' to broadcast 1080p stream over network")
+                                .font(.system(size: 12))
+                                .foregroundColor(Color(red: 161/255, green: 161/255, blue: 170/255))
                         }
                     }
                 } else {
@@ -165,8 +164,8 @@ struct ContentView: View {
                         HStack {
                             HStack(spacing: 6) {
                                 Circle()
-                                    .fill(Color(red: 16/255, green: 185/255, blue: 129/255))
-                                    .frame(width: 8, height: 8)
+                                    .fill(Color.white)
+                                    .frame(width: 7, height: 7)
 
                                 Text("LIVE BROADCAST")
                                     .font(.system(size: 10, weight: .bold))
@@ -174,19 +173,20 @@ struct ContentView: View {
                             }
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
-                            .background(Color.black.opacity(0.75))
+                            .background(Color.black.opacity(0.85))
                             .clipShape(Capsule())
-                            .overlay(Capsule().stroke(Color.white.opacity(0.15), lineWidth: 1))
+                            .overlay(Capsule().stroke(Color.white.opacity(0.2), lineWidth: 1))
 
                             Spacer()
 
                             Text("H.264 • 1080p30")
-                                .font(.system(size: 11, weight: .semibold))
-                                .foregroundColor(.white.opacity(0.9))
+                                .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                                .foregroundColor(.white)
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 5)
-                                .background(Color.black.opacity(0.75))
+                                .background(Color.black.opacity(0.85))
                                 .clipShape(Capsule())
+                                .overlay(Capsule().stroke(Color.white.opacity(0.12), lineWidth: 1))
                         }
                         .padding(14)
 
@@ -204,7 +204,7 @@ struct ContentView: View {
                             HStack(spacing: 6) {
                                 Image(systemName: "network")
                                     .font(.system(size: 12, weight: .bold))
-                                    .foregroundColor(Color(red: 16/255, green: 185/255, blue: 129/255))
+                                    .foregroundColor(.white)
 
                                 Text("\(camera.streamServer.localIP):\(camera.streamServer.port)")
                                     .font(.system(size: 13, weight: .semibold, design: .monospaced))
@@ -220,7 +220,7 @@ struct ContentView: View {
                                 }) {
                                     Image(systemName: copiedIPAlert ? "checkmark" : "doc.on.doc")
                                         .font(.system(size: 11, weight: .semibold))
-                                        .foregroundColor(copiedIPAlert ? Color(red: 16/255, green: 185/255, blue: 129/255) : Color.gray)
+                                        .foregroundColor(copiedIPAlert ? .white : Color(red: 161/255, green: 161/255, blue: 170/255))
                                 }
                                 .buttonStyle(.plain)
                                 .help("Copy Server Address")
@@ -229,32 +229,34 @@ struct ContentView: View {
                             .padding(.vertical, 6)
                             .background(Color(red: 24/255, green: 24/255, blue: 27/255))
                             .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.1), lineWidth: 1))
 
                             HStack(spacing: 6) {
                                 Image(systemName: "person.2.fill")
                                     .font(.system(size: 12))
-                                    .foregroundColor(Color.gray)
+                                    .foregroundColor(Color(red: 161/255, green: 161/255, blue: 170/255))
 
                                 Text("\(camera.streamServer.clientCount) client(s)")
                                     .font(.system(size: 12, weight: .medium))
-                                    .foregroundColor(Color.gray)
+                                    .foregroundColor(Color(red: 161/255, green: 161/255, blue: 170/255))
                             }
                         }
                     } else {
                         HStack(spacing: 8) {
                             Circle()
-                                .fill(Color.red)
+                                .fill(Color(red: 113/255, green: 113/255, blue: 122/255))
                                 .frame(width: 8, height: 8)
 
                             Text("Stream server stopped")
                                 .font(.system(size: 13, weight: .medium))
-                                .foregroundColor(.red)
+                                .foregroundColor(Color(red: 161/255, green: 161/255, blue: 170/255))
                         }
                     }
                 }
 
                 Spacer()
 
+                // Solid White Primary Button vs Dark Bordered Secondary Button
                 if !camera.isRunning {
                     Button(action: { camera.start() }) {
                         HStack(spacing: 8) {
@@ -264,16 +266,12 @@ struct ContentView: View {
                             Text("Start Camera")
                                 .font(.system(size: 13, weight: .bold))
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, 22)
                         .padding(.vertical, 10)
-                        .background(LinearGradient(
-                            colors: [Color(red: 16/255, green: 185/255, blue: 129/255), Color(red: 5/255, green: 150/255, blue: 105/255)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ))
-                        .foregroundColor(.white)
+                        .background(Color.white)
+                        .foregroundColor(.black)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
-                        .shadow(color: Color(red: 16/255, green: 185/255, blue: 129/255).opacity(0.3), radius: 6, x: 0, y: 3)
+                        .shadow(color: Color.white.opacity(0.15), radius: 8, x: 0, y: 2)
                     }
                     .buttonStyle(.plain)
                 } else {
@@ -285,14 +283,14 @@ struct ContentView: View {
                             Text("Stop Camera")
                                 .font(.system(size: 13, weight: .bold))
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, 22)
                         .padding(.vertical, 10)
-                        .background(Color(red: 239/255, green: 68/255, blue: 68/255).opacity(0.2))
-                        .foregroundColor(Color(red: 248/255, green: 113/255, blue: 113/255))
+                        .background(Color(red: 24/255, green: 24/255, blue: 27/255))
+                        .foregroundColor(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                         .overlay(
                             RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color(red: 239/255, green: 68/255, blue: 68/255).opacity(0.4), lineWidth: 1)
+                                .stroke(Color.white.opacity(0.2), lineWidth: 1)
                         )
                     }
                     .buttonStyle(.plain)
@@ -309,7 +307,7 @@ struct ContentView: View {
         }
     }
 
-    // MARK: - Receiver View
+    // MARK: - Receiver View (Monochrome Black & White)
 
     private var receiverView: some View {
         VStack(spacing: 16) {
@@ -321,11 +319,11 @@ struct ContentView: View {
                         HStack(spacing: 6) {
                             Image(systemName: "antenna.radiowaves.left.and.right")
                                 .font(.system(size: 13, weight: .semibold))
-                                .foregroundColor(Color(red: 16/255, green: 185/255, blue: 129/255))
+                                .foregroundColor(.white)
 
                             Text("DISCOVERED CAMERAS:")
                                 .font(.system(size: 11, weight: .bold))
-                                .foregroundColor(Color.gray)
+                                .foregroundColor(Color(red: 161/255, green: 161/255, blue: 170/255))
                         }
 
                         ScrollView(.horizontal, showsIndicators: false) {
@@ -348,7 +346,7 @@ struct ContentView: View {
                                         .clipShape(RoundedRectangle(cornerRadius: 8))
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 8)
-                                                .stroke(Color(red: 16/255, green: 185/255, blue: 129/255).opacity(0.5), lineWidth: 1)
+                                                .stroke(Color.white.opacity(0.2), lineWidth: 1)
                                         )
                                     }
                                     .buttonStyle(.plain)
@@ -369,12 +367,12 @@ struct ContentView: View {
                     HStack(spacing: 10) {
                         Image(systemName: "network")
                             .font(.system(size: 14))
-                            .foregroundColor(Color.gray)
+                            .foregroundColor(Color(red: 161/255, green: 161/255, blue: 170/255))
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text("SENDER IP ADDRESS")
                                 .font(.system(size: 10, weight: .bold))
-                                .foregroundColor(Color.gray)
+                                .foregroundColor(Color(red: 161/255, green: 161/255, blue: 170/255))
 
                             TextField("192.168.1.45", text: $receiverIP)
                                 .textFieldStyle(.plain)
@@ -386,16 +384,17 @@ struct ContentView: View {
                     .padding(.vertical, 8)
                     .background(Color(red: 24/255, green: 24/255, blue: 27/255))
                     .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.white.opacity(0.08), lineWidth: 1))
 
                     HStack(spacing: 8) {
                         Image(systemName: "number")
                             .font(.system(size: 14))
-                            .foregroundColor(Color.gray)
+                            .foregroundColor(Color(red: 161/255, green: 161/255, blue: 170/255))
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text("PORT")
                                 .font(.system(size: 10, weight: .bold))
-                                .foregroundColor(Color.gray)
+                                .foregroundColor(Color(red: 161/255, green: 161/255, blue: 170/255))
 
                             TextField("8080", text: $receiverPort)
                                 .textFieldStyle(.plain)
@@ -408,6 +407,7 @@ struct ContentView: View {
                     .padding(.vertical, 8)
                     .background(Color(red: 24/255, green: 24/255, blue: 27/255))
                     .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.white.opacity(0.08), lineWidth: 1))
 
                     Spacer()
 
@@ -424,16 +424,12 @@ struct ContentView: View {
                                 Text("Connect Stream")
                                     .font(.system(size: 13, weight: .bold))
                             }
-                            .padding(.horizontal, 20)
+                            .padding(.horizontal, 22)
                             .padding(.vertical, 10)
-                            .background(LinearGradient(
-                                colors: [Color(red: 16/255, green: 185/255, blue: 129/255), Color(red: 5/255, green: 150/255, blue: 105/255)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ))
-                            .foregroundColor(.white)
+                            .background(Color.white)
+                            .foregroundColor(.black)
                             .clipShape(RoundedRectangle(cornerRadius: 10))
-                            .shadow(color: Color(red: 16/255, green: 185/255, blue: 129/255).opacity(0.3), radius: 6, x: 0, y: 3)
+                            .shadow(color: Color.white.opacity(0.15), radius: 8, x: 0, y: 2)
                         }
                         .buttonStyle(.plain)
                     } else {
@@ -445,14 +441,14 @@ struct ContentView: View {
                                 Text("Disconnect")
                                     .font(.system(size: 13, weight: .bold))
                             }
-                            .padding(.horizontal, 20)
+                            .padding(.horizontal, 22)
                             .padding(.vertical, 10)
-                            .background(Color(red: 239/255, green: 68/255, blue: 68/255).opacity(0.2))
-                            .foregroundColor(Color(red: 248/255, green: 113/255, blue: 113/255))
+                            .background(Color(red: 24/255, green: 24/255, blue: 27/255))
+                            .foregroundColor(.white)
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 10)
-                                    .stroke(Color(red: 239/255, green: 68/255, blue: 68/255).opacity(0.4), lineWidth: 1)
+                                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
                             )
                         }
                         .buttonStyle(.plain)
@@ -474,30 +470,30 @@ struct ContentView: View {
                     .fill(Color.black)
                     .overlay(
                         RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                            .stroke(Color.white.opacity(0.12), lineWidth: 1)
                     )
 
                 if !receiver.isConnected {
                     VStack(spacing: 14) {
                         ZStack {
                             Circle()
-                                .fill(Color.white.opacity(0.05))
+                                .fill(Color.white.opacity(0.04))
                                 .frame(width: 80, height: 80)
+                                .overlay(Circle().stroke(Color.white.opacity(0.08), lineWidth: 1))
 
                             Image(systemName: "antenna.radiowaves.left.and.right")
-                                .font(.system(size: 36))
-                                .foregroundColor(Color(red: 16/255, green: 185/255, blue: 129/255))
+                                .font(.system(size: 34))
+                                .foregroundColor(.white)
                         }
 
                         VStack(spacing: 4) {
                             Text("Ready to Receive Stream")
-                                .font(.title3)
-                                .fontWeight(.bold)
+                                .font(.system(size: 17, weight: .bold))
                                 .foregroundColor(.white)
 
                             Text("Select an auto-discovered camera or enter camera sender IP and port above")
-                                .font(.caption)
-                                .foregroundColor(Color.gray)
+                                .font(.system(size: 12))
+                                .foregroundColor(Color(red: 161/255, green: 161/255, blue: 170/255))
                         }
                     }
                 } else {
@@ -510,8 +506,8 @@ struct ContentView: View {
                         HStack {
                             HStack(spacing: 6) {
                                 Circle()
-                                    .fill(Color(red: 16/255, green: 185/255, blue: 129/255))
-                                    .frame(width: 8, height: 8)
+                                    .fill(Color.white)
+                                    .frame(width: 7, height: 7)
 
                                 Text("CONNECTED")
                                     .font(.system(size: 10, weight: .bold))
@@ -519,9 +515,9 @@ struct ContentView: View {
                             }
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
-                            .background(Color.black.opacity(0.75))
+                            .background(Color.black.opacity(0.85))
                             .clipShape(Capsule())
-                            .overlay(Capsule().stroke(Color.white.opacity(0.15), lineWidth: 1))
+                            .overlay(Capsule().stroke(Color.white.opacity(0.2), lineWidth: 1))
 
                             Spacer()
 
@@ -538,8 +534,9 @@ struct ContentView: View {
                             .foregroundColor(.white)
                             .padding(.horizontal, 12)
                             .padding(.vertical, 5)
-                            .background(Color.black.opacity(0.75))
+                            .background(Color.black.opacity(0.85))
                             .clipShape(Capsule())
+                            .overlay(Capsule().stroke(Color.white.opacity(0.12), lineWidth: 1))
                         }
                         .padding(14)
 

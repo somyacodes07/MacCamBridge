@@ -7,23 +7,21 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --bg-dark: #000000;
             --bg-surface: #09090b;
-            --bg-card: rgba(18, 18, 20, 0.85);
+            --bg-card: rgba(18, 18, 20, 0.95);
             --bg-input: #18181b;
-            --border-glass: rgba(255, 255, 255, 0.07);
-            --border-hover: rgba(255, 255, 255, 0.2);
-            
-            --accent-emerald: #10b981;
-            --accent-green-glow: rgba(16, 185, 129, 0.2);
-            --accent-red: #ef4444;
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.22);
+
+            --accent-primary: #ffffff;
             --accent-zinc: #27272a;
 
-            --text-main: #f4f4f5;
+            --text-main: #ffffff;
             --text-muted: #a1a1aa;
             --text-dim: #71717a;
         }
@@ -45,7 +43,7 @@
             user-select: none;
         }
 
-        /* Custom Title Bar */
+        /* Custom Windows Title Bar */
         .titlebar {
             height: 38px;
             background: #000000;
@@ -70,7 +68,7 @@
         .titlebar-brand svg {
             width: 16px;
             height: 16px;
-            fill: var(--accent-emerald);
+            fill: #ffffff;
         }
 
         .window-controls {
@@ -98,7 +96,7 @@
         }
 
         .window-btn.btn-close:hover {
-            background: #ef4444;
+            background: #27272a;
             color: white;
         }
 
@@ -122,27 +120,26 @@
         }
 
         .brand-logo {
-            width: 42px;
-            height: 42px;
+            width: 40px;
+            height: 40px;
             background: #18181b;
             border: 1px solid var(--border-glass);
-            border-radius: 12px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .brand-logo svg {
-            width: 22px;
-            height: 22px;
-            fill: var(--accent-emerald);
+            width: 20px;
+            height: 20px;
+            fill: #ffffff;
         }
 
         .brand-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.4px;
             color: var(--text-main);
         }
 
@@ -177,10 +174,16 @@
             transition: all 0.2s ease;
         }
 
+        .tab-btn svg {
+            width: 15px;
+            height: 15px;
+            fill: currentColor;
+        }
+
         .tab-btn.active {
-            background: #27272a;
-            color: var(--text-main);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            background: #ffffff;
+            color: #000000;
+            box-shadow: 0 2px 8px rgba(255, 255, 255, 0.15);
         }
 
         /* Status Badges */
@@ -193,39 +196,40 @@
         .status-badge {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
-            padding: 8px 18px;
+            gap: 8px;
+            padding: 8px 16px;
             border-radius: 30px;
-            font-size: 13px;
-            font-weight: 600;
-            background: rgba(239, 68, 68, 0.12);
-            color: var(--accent-red);
-            border: 1px solid rgba(239, 68, 68, 0.25);
+            font-size: 12px;
+            font-weight: 700;
+            background: #18181b;
+            color: var(--text-muted);
+            border: 1px solid var(--border-glass);
             transition: all 0.3s ease;
         }
 
         .status-badge.connected {
-            background: rgba(16, 185, 129, 0.12);
-            color: var(--accent-emerald);
-            border-color: rgba(16, 185, 129, 0.3);
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+            background: #18181b;
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 16px rgba(255, 255, 255, 0.08);
         }
 
         .status-dot {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
-            background-color: currentColor;
-            box-shadow: 0 0 10px currentColor;
+            background-color: var(--text-dim);
         }
 
         .status-badge.connected .status-dot {
+            background-color: #ffffff;
+            box-shadow: 0 0 8px #ffffff;
             animation: pulse-dot 2s infinite;
         }
 
         @keyframes pulse-dot {
             0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.4); opacity: 0.7; }
+            50% { transform: scale(1.3); opacity: 0.7; }
         }
 
         /* Main Container */
@@ -244,8 +248,8 @@
         .control-panel {
             background: var(--bg-card);
             border: 1px solid var(--border-glass);
-            border-radius: 20px;
-            padding: 20px 24px;
+            border-radius: 16px;
+            padding: 18px 24px;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
@@ -268,11 +272,11 @@
         }
 
         .input-label {
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 10px;
+            font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.6px;
         }
 
         .input-wrapper {
@@ -284,21 +288,21 @@
         .input-icon {
             position: absolute;
             left: 14px;
-            width: 18px;
-            height: 18px;
-            stroke: var(--text-dim);
+            width: 16px;
+            height: 16px;
+            stroke: var(--text-muted);
             pointer-events: none;
-            transition: stroke 0.2s;
         }
 
         input[type="text"] {
             background: var(--bg-input);
             border: 1px solid var(--border-glass);
             color: var(--text-main);
-            padding: 12px 16px 12px 42px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 500;
+            padding: 10px 16px 10px 40px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
             outline: none;
             width: 220px;
             transition: all 0.2s ease;
@@ -315,30 +319,34 @@
             gap: 12px;
         }
 
+        /* Solid White Primary Button */
         .btn {
-            background: var(--accent-emerald);
+            background: #ffffff;
             color: #000000;
             border: none;
-            padding: 12px 24px;
-            border-radius: 12px;
+            padding: 11px 22px;
+            border-radius: 10px;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            box-shadow: 0 4px 14px rgba(255, 255, 255, 0.12);
         }
 
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+            transform: translateY(-1px);
+            background: #f4f4f5;
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.2);
         }
 
         .btn:active {
             transform: translateY(0);
         }
 
+        /* Dark Bordered Secondary Button */
         .btn-secondary {
             background: #18181b;
             color: var(--text-main);
@@ -352,15 +360,22 @@
         }
 
         .btn-danger {
-            background: var(--accent-red);
-            color: white;
+            background: #18181b;
+            color: #ffffff;
+            border: 1px solid var(--border-hover);
+            box-shadow: none;
+        }
+
+        .btn-danger:hover {
+            background: #27272a;
+            border-color: #ffffff;
         }
 
         /* Video Stage */
         .video-stage {
             position: relative;
             background: #000000;
-            border-radius: 24px;
+            border-radius: 20px;
             overflow: hidden;
             border: 1px solid var(--border-glass);
             aspect-ratio: 16 / 9;
@@ -380,12 +395,13 @@
         /* Video Overlays */
         .overlay-badge {
             position: absolute;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             border: 1px solid var(--border-glass);
-            padding: 8px 14px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
             color: var(--text-main);
             display: flex;
             align-items: center;
@@ -393,15 +409,15 @@
             z-index: 10;
         }
 
-        .overlay-top-left { top: 20px; left: 20px; }
-        .overlay-top-right { top: 20px; right: 20px; }
+        .overlay-top-left { top: 16px; left: 16px; }
+        .overlay-top-right { top: 16px; right: 16px; }
 
         .placeholder-state {
             position: absolute;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 18px;
             color: var(--text-muted);
             text-align: center;
             max-width: 440px;
@@ -409,8 +425,8 @@
         }
 
         .radar-icon-wrap {
-            width: 80px;
-            height: 80px;
+            width: 76px;
+            height: 76px;
             border-radius: 50%;
             background: #18181b;
             border: 1px solid var(--border-glass);
@@ -420,21 +436,20 @@
         }
 
         .radar-icon-wrap svg {
-            width: 36px;
-            height: 36px;
-            stroke: var(--accent-emerald);
+            width: 34px;
+            height: 34px;
+            stroke: #ffffff;
         }
 
         .placeholder-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 22px;
+            font-size: 18px;
             font-weight: 700;
             color: var(--text-main);
         }
 
         .placeholder-desc {
-            font-size: 14px;
-            line-height: 1.6;
+            font-size: 13px;
+            line-height: 1.5;
             color: var(--text-muted);
         }
 
@@ -442,23 +457,22 @@
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
+            gap: 16px;
         }
 
         .metric-card {
             background: var(--bg-card);
             border: 1px solid var(--border-glass);
-            border-radius: 18px;
-            padding: 20px 24px;
+            border-radius: 16px;
+            padding: 18px 22px;
             display: flex;
             flex-direction: column;
             gap: 8px;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
         }
 
         .metric-card:hover {
             border-color: var(--border-hover);
-            transform: translateY(-2px);
         }
 
         .metric-header {
@@ -468,22 +482,22 @@
         }
 
         .metric-title {
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 11px;
+            font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.6px;
         }
 
         .metric-icon {
-            width: 20px;
-            height: 20px;
-            stroke: var(--accent-emerald);
+            width: 18px;
+            height: 18px;
+            stroke: #ffffff;
         }
 
         .metric-value {
-            font-family: 'Outfit', sans-serif;
-            font-size: 28px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 24px;
             font-weight: 700;
             color: var(--text-main);
         }
@@ -492,8 +506,8 @@
         .virtual-cam-banner {
             background: #18181b;
             border: 1px solid var(--border-glass);
-            border-radius: 18px;
-            padding: 18px 24px;
+            border-radius: 16px;
+            padding: 16px 22px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -507,8 +521,8 @@
         }
 
         .vcam-title {
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 700;
             color: var(--text-main);
         }
 
@@ -536,10 +550,10 @@
         .modal-card {
             background: #09090b;
             border: 1px solid var(--border-glass);
-            border-radius: 24px;
+            border-radius: 20px;
             width: 520px;
             max-width: 90%;
-            padding: 32px;
+            padding: 28px;
             display: flex;
             flex-direction: column;
             gap: 20px;
@@ -552,17 +566,16 @@
         }
 
         .modal-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
             color: var(--text-main);
         }
 
         .scan-spinner {
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             border: 3px solid #27272a;
-            border-top-color: var(--accent-emerald);
+            border-top-color: #ffffff;
             border-radius: 50%;
             animation: spin 1s infinite linear;
         }
@@ -580,7 +593,7 @@
         .device-item {
             background: #18181b;
             border: 1px solid var(--border-glass);
-            border-radius: 14px;
+            border-radius: 12px;
             padding: 14px 18px;
             display: flex;
             align-items: center;
@@ -590,7 +603,7 @@
         }
 
         .device-item:hover {
-            border-color: var(--accent-emerald);
+            border-color: #ffffff;
             background: #27272a;
         }
 
@@ -601,15 +614,15 @@
         }
 
         .device-name {
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 700;
             color: var(--text-main);
         }
 
         .device-ip {
             font-size: 12px;
             color: var(--text-muted);
-            font-family: monospace;
+            font-family: 'JetBrains Mono', monospace;
         }
     </style>
 </head>
@@ -641,16 +654,18 @@
             </div>
             <div>
                 <div class="brand-title">MacCam Bridge</div>
-                <div class="brand-subtitle" id="subTitleText">Windows 11 Camera & Receiver</div>
+                <div class="brand-subtitle" id="subTitleText">Windows 11 Camera Receiver</div>
             </div>
         </div>
 
         <div class="mode-tabs">
             <button class="tab-btn active" id="tabReceiver" onclick="switchMode('receiver')">
-                📺 Receiver Mode
+                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12z"/></svg>
+                Camera Receiver
             </button>
             <button class="tab-btn" id="tabSender" onclick="switchMode('sender')">
-                📷 Sender Mode
+                <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+                Camera Sender
             </button>
         </div>
 
@@ -696,14 +711,14 @@
 
                 <div class="btn-group">
                     <button class="btn" id="connectBtn" onclick="toggleConnect()">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                             <polygon points="5 3 19 12 5 21 5 3"/>
                         </svg>
                         Connect Stream
                     </button>
 
                     <button class="btn btn-secondary" onclick="scanLanDevices()">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
                         </svg>
                         Scan LAN
@@ -716,8 +731,8 @@
         <div id="senderPanel" style="display: none;">
             <div class="control-panel">
                 <div>
-                    <div style="font-size: 16px; font-weight: 700; color: var(--text-main);">Windows Camera Broadcast Server</div>
-                    <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Broadcasting PC camera stream on Wi-Fi at <strong>ws://192.168.1.100:8080</strong></div>
+                    <div style="font-size: 15px; font-weight: 700; color: var(--text-main);">Windows Camera Broadcast Server</div>
+                    <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Broadcasting PC camera stream on Wi-Fi at <strong>ws://192.168.1.100:8080</strong></div>
                 </div>
                 <button class="btn" id="senderCamBtn" onclick="toggleSenderCam()">Start Local Camera</button>
             </div>
@@ -726,7 +741,7 @@
         <!-- Virtual Camera Driver Control Banner -->
         <div class="virtual-cam-banner">
             <div class="vcam-info">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="stroke: var(--accent-emerald);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="stroke: #ffffff;">
                     <path d="M23 7l-7 5 7 5V7z"/>
                     <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
                 </svg>
@@ -918,12 +933,10 @@
                     if (res.success) {
                         isVcamActive = true;
                         btn.innerText = 'Disable System Webcam';
-                        btn.classList.add('btn-danger');
                     }
                 } else {
                     isVcamActive = true;
                     btn.innerText = 'Disable System Webcam';
-                    btn.classList.add('btn-danger');
                 }
             } else {
                 if (ipcRenderer) {
@@ -931,7 +944,6 @@
                 }
                 isVcamActive = false;
                 btn.innerText = 'Enable Direct System Webcam';
-                btn.classList.remove('btn-danger');
             }
         }
 
@@ -990,13 +1002,13 @@
                     statusText.innerText = 'Live Streaming';
                     
                     connectBtn.innerHTML = `
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                             <rect x="6" y="4" width="4" height="16"/>
                             <rect x="14" y="4" width="4" height="16"/>
                         </svg>
                         Disconnect
                     `;
-                    connectBtn.classList.add('btn-danger');
+                    connectBtn.classList.add('btn-secondary');
                     connectBtn.disabled = false;
 
                     document.getElementById('placeholderOverlay').style.display = 'none';
@@ -1043,12 +1055,12 @@
             statusText.innerText = 'Disconnected';
 
             connectBtn.innerHTML = `
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                     <polygon points="5 3 19 12 5 21 5 3"/>
                 </svg>
                 Connect Stream
             `;
-            connectBtn.classList.remove('btn-danger');
+            connectBtn.classList.remove('btn-secondary');
             connectBtn.disabled = false;
 
             document.getElementById('placeholderOverlay').style.display = 'flex';
