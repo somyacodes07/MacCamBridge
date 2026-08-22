@@ -65,6 +65,20 @@ AVCaptureVideoPreviewLayer                             AVCaptureVideoDataOutput
 
 ---
 
+## ⚡ High-Speed USB-C to USB-C Wired Connection Mode (Sub-5ms Ultra-Low Latency)
+
+MacCam Bridge natively supports direct **USB-C to USB-C wired connection** between MacBook and Windows PC or another Mac for ultra-low latency streaming without relying on Wi-Fi!
+
+### How to Connect via USB-C Cable:
+1. **Plug USB-C Cable**: Connect a USB-C to USB-C cable directly between your MacBook and Windows PC / Mac.
+2. **Auto-Assigned USB IP Link**: macOS and Windows automatically establish a high-speed **Thunderbolt Bridge / USB Ethernet** network adapter (e.g. `169.254.x.x`).
+3. **Connect in MacCam Bridge**:
+   - **Automatic Discovery**: Click **Scan LAN** in the Windows Receiver app — it scans all network interfaces including the USB-C link and discovers your MacBook instantly!
+   - **Manual Input**: Enter the IP address shown on the MacBook app (e.g. `169.254.88.12:8080`) into the Windows Receiver IP input.
+4. **Ultra-Low Latency Performance**: Enjoy up to 40 Gbps wired bandwidth with **sub-5ms ultra-low latency** and zero Wi-Fi packet drops.
+
+---
+
 ## Binary Stream Protocol (`MCB1`)
 
 Network payloads are packed into binary frame packets using the following memory layout:

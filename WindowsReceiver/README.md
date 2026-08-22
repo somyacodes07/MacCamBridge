@@ -24,9 +24,9 @@ npm install
 npm start
 ```
 
-### 2. Connect to MacBook Stream
-1. Click **Scan LAN** to automatically discover your MacBook camera stream, or type your MacBook IP address (e.g. `192.168.1.45`) and port (`8080`).
-2. Click **Connect Stream**.
+### 2. Connect to MacBook Stream (Wi-Fi or USB-C Cable)
+- **Wi-Fi Mode**: Click **Scan LAN** to automatically discover your MacBook camera stream, or type your MacBook IP address (e.g. `192.168.1.45`) and port (`8080`).
+- **USB-C Wired Mode (0ms Latency)**: Plug a USB-C to USB-C cable between MacBook and PC. macOS and Windows automatically establish a high-speed Thunderbolt / USB Ethernet link (e.g. `169.254.x.x`). Click **Scan LAN** or enter the USB IP address shown on Mac app.
 
 ### 3. Enable System Virtual Webcam
 Click **Enable Direct System Webcam** to expose the stream as a system webcam device ("MacCam Bridge Camera") for Discord, Zoom, Teams, and OBS Studio.
