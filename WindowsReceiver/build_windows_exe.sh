@@ -5,8 +5,14 @@ echo "================================================="
 
 cd "$(dirname "$0")"
 
-npm install
-npm run dist
+if [ ! -d "node_modules" ]; then
+    echo "[*] Installing dependencies with npm..."
+    npm install
+fi
+
+echo "[*] Packaging Windows Executables & Installers with electron-builder..."
+npx electron-builder --win --config.win.target=portable
 
 echo ""
-echo "[+] Build complete! Check 'dist/' folder for MacCam Bridge Setup.exe"
+echo "[+] Windows Executable Build Complete!"
+echo "[+] Output artifacts generated in 'dist/' folder."
