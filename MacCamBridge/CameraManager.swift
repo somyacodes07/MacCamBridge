@@ -228,6 +228,12 @@ final class CameraManager: NSObject, ObservableObject {
                 return
             }
 
+            if !self.streamServer.isRunning {
+                self.streamServer.start(
+                    port: 8080
+                )
+            }
+
             guard
                 !self.session.isRunning
             else {
