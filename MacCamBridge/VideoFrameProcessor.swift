@@ -52,6 +52,15 @@ final class VideoFrameProcessor:
     ) {
         frameCount += 1
 
+        if let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) {
+            print(
+                "Frame size:",
+                CVPixelBufferGetWidth(pixelBuffer),
+                "x",
+                CVPixelBufferGetHeight(pixelBuffer)
+            )
+        }
+
         // Controlled diagnostic logging
         if isDiagnosticLoggingEnabled && frameCount % diagnosticLogInterval == 0 {
             logFrameDiagnostics(sampleBuffer: sampleBuffer)
