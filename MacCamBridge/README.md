@@ -1,51 +1,49 @@
-# MacCam Bridge — macOS Application
+# 🍏 MacCam Bridge — Native macOS Application
 
 <p align="center">
-  <img src="logo.svg" width="140" height="140" alt="MacCam Bridge Logo" />
+  <img src="Assets.xcassets/AppLogo.imageset/logo.png" width="120" height="120" alt="MacCam Bridge Logo" />
 </p>
 
-The macOS application provides a high-performance **Camera Broadcast Sender** and **Camera Stream Receiver** built natively with SwiftUI, AVFoundation, VideoToolbox, and Network framework.
+The native **macOS Application** is built with SwiftUI, AVFoundation, VideoToolbox, and Network framework. It acts as both a **Camera Broadcast Sender** (encoding 1080p HD video on the Apple Silicon / Intel GPU) and a **Camera Stream Receiver**.
 
 ---
 
-## Technical Features
+## ⚡ Technical Features
 
-- **Dual-Mode SwiftUI Application**: Easily toggle between **Camera Sender** and **Camera Receiver** using a polished monochrome segmented tab bar.
-- **Hardware-Accelerated Encoding**: Zero-copy H.264 hardware encoding via macOS VideoToolbox (`VTCompressionSession`), streaming 1080p HD video at 30 FPS.
-- **Hardware-Accelerated Decoding**: VideoToolbox hardware decoding (`VTDecompressionSession`) for real-time video playback in Receiver mode.
-- **Low-Latency Rendering Engine**: Direct frame rendering via `AVSampleBufferDisplayLayer` and `NSViewRepresentable`.
-- **mDNS / Bonjour Auto-Discovery**: Automatically browses local Wi-Fi/LAN networks for active camera senders (`_maccambridge._tcp`) using `NWBrowser`.
-- **Custom Binary Streaming Protocol (`MCB1`)**: Binary framing layout with precision `CMTime` timestamps and H.264 SPS/PPS configuration parameters.
+- **Dual-Mode SwiftUI Interface**: Seamlessly switch between **Camera Broadcast Sender** and **Camera Receiver** using Apple HIG monochrome pitch-dark obsidian styling.
+- **VideoToolbox GPU H.264 Encoder**: Zero-copy 1080p 60FPS H.264 hardware encoding (`VTCompressionSession`) targeting 8 Mbps bitrate.
+- **VideoToolbox GPU H.264 Decoder**: Hardware decompression (`VTDecompressionSession`) rendered directly via `AVSampleBufferDisplayLayer`.
+- **Bonjour mDNS Auto-Discovery**: Automatic network advertisement (`_maccambridge._tcp`) and background network scanning via `NWBrowser`.
+- **Multi-IP Auto-Detection**: Detects both local Wi-Fi (`192.168.x.x`) and **USB-C Direct Link (`169.254.x.x`)** with 1-click address copy.
+- **Custom Binary Streaming Protocol (`MCB1`)**: Low-overhead packet framing format with precision `CMTime` timestamps and NAL unit demuxing.
 
 ---
 
-## Directory Structure
+## 📁 Source Code Architecture
 
 ```text
 MacCamBridge/
-├── MacCamBridgeApp.swift          # Main SwiftUI App Entry Point
-├── ContentView.swift              # Dual-Mode Monochrome HIG User Interface
-├── CameraManager.swift            # AVCaptureSession Camera Pipeline Manager
-├── CameraPreview.swift            # AVCaptureVideoPreviewLayer SwiftUI View
-├── VideoFrameProcessor.swift      # Serial Background Delegate & Consumer Dispatch
-├── H264Encoder.swift              # VideoToolbox VTCompressionSession Encoder
-├── H264Decoder.swift              # VideoToolbox VTDecompressionSession Decoder
-├── SampleBufferDisplayView.swift  # AVSampleBufferDisplayLayer SwiftUI Wrapper
+├── MacCamBridgeApp.swift          # Main SwiftUI App Lifecycle Entry Point
+├── ContentView.swift              # Dual-Mode Pitch-Dark Obsidian UI & Controls
+├── CameraManager.swift            # AVCaptureSession Camera Manager & Device Selection
+├── CameraPreview.swift            # AVCaptureVideoPreviewLayer SwiftUI NSViewRepresentable
+├── VideoFrameProcessor.swift      # Serial Background Delegate & Consumer Pipeline
+├── H264Encoder.swift              # VideoToolbox VTCompressionSession H.264 Encoder
+├── H264Decoder.swift              # VideoToolbox VTDecompressionSession H.264 Decoder
+├── SampleBufferDisplayView.swift  # AVSampleBufferDisplayLayer Low-Latency Renderer
 ├── BonjourBrowser.swift           # NWBrowser Local mDNS Service Auto-Discovery
-├── StreamingServer.swift          # NWListener TCP / WebSocket Stream Server
-├── StreamReceiver.swift           # NWConnection Stream Receiver & MCB1 Packet Demuxer
-├── StreamProtocol.swift           # MCB1 Binary Frame Layout Definition
-└── Assets.xcassets/               # App Icons & Color Assets
+├── StreamingServer.swift          # NWListener TCP / WebSocket Multi-IP Server
+├── StreamReceiver.swift           # NWConnection Receiver & MCB1 Demuxer
+└── StreamProtocol.swift           # MCB1 Binary Protocol Header Definition
 ```
 
 ---
 
-## Building & DMG Packaging
+## 🛠️ Building & Packaging DMG
 
-To compile and package the macOS release `.dmg` installer:
+Compile and build the release disk image (`MacCamBridge-macOS.dmg`):
 
 ```bash
-DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer ./build_mac_dmg.sh
+cd ..
+./build_mac_dmg.sh
 ```
-
-The output disk image will be created at `MacCamBridge-macOS.dmg`.

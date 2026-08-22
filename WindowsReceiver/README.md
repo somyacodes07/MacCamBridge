@@ -1,44 +1,46 @@
-# MacCam Bridge — Windows 11 Receiver Application
+# 🪟 MacCam Bridge — Windows 11 Receiver Application
 
-The Windows Receiver application connects to the **MacCam Bridge Sender** (macOS application) over local Wi-Fi / LAN, receives low-latency 1080p H.264 video streams, and decodes them on the GPU using W3C WebCodecs while exposing the feed as a native system-wide Virtual Webcam for Windows applications like OBS Studio, Discord, Zoom, Google Meet, and Microsoft Teams.
+<p align="center">
+  <img src="logo.svg" width="120" height="120" alt="MacCam Bridge Logo" />
+</p>
 
----
-
-## Technical Features
-
-- **Electron Desktop Application**: Native Windows 11 frameless dark-mode interface with custom title bar and monochrome HIG styling.
-- **Hardware-Accelerated WebCodecs Decoder**: Decodes incoming `MCB1` H.264 packets on the Windows GPU using Chromium WebCodecs (`VideoDecoder`), achieving sub-15ms rendering latency.
-- **Binary Protocol Demuxer (`mcb_protocol_decoder.js`)**: Parses raw WebSocket binary payloads, reconstructs Annex-B NAL units, and feeds keyframes and P-frames to the decoder.
-- **Automatic LAN Scanner**: Scans local Wi-Fi IPv4 subnets for active MacBook camera senders operating on ports `8080-8085`.
-- **System-Wide Virtual Webcam Integration**: Exposes camera stream directly to Windows applications via `pyvirtualcam` (`MacCam Bridge Camera`).
+The **Windows 11 Receiver Application** connects to the **MacCam Bridge Sender** (macOS application) over local Wi-Fi or high-speed USB-C direct link, decodes 1080p H.264 video streams on the Windows GPU using W3C WebCodecs, and exposes the feed as a native Virtual Webcam for Windows applications like OBS Studio, Discord, Zoom, Google Meet, and Microsoft Teams.
 
 ---
 
-## Quick Start on Windows 11
+## ⚡ Technical Features
 
-### 1. Run Desktop Receiver App
-Open Command Prompt / PowerShell in `WindowsReceiver` directory:
+- **Electron Pitch-Dark Obsidian UI**: Native Windows 11 frameless interface with custom titlebar, hidden scrollbars, and **System Tray Taskbar Toolbar integration**.
+- **W3C WebCodecs GPU Decoding**: Hardware-accelerated H.264 GPU decoding (`VideoDecoder`) achieving sub-5ms rendering latency.
+- **Keyframe Stream Synchronization**: Macroblock-free streaming engine (`hasReceivedFirstKeyframe`) preventing all pixelation and smearing.
+- **Direct System Virtual Webcam**: Integrated `pyvirtualcam` frame engine registering **`"MacCam Bridge Camera"`** natively for Windows applications.
+- **1-Click VirtualCam Driver Auto-Installer**: Automatically detects missing Python dependencies and installs `pyvirtualcam`, `opencv-python`, and `numpy` with 1 click.
+- **Interactive Transport Mode Selector**: Easily switch between `[ 📶 Wi-Fi Wireless Mode ]` and `[ ⚡ USB-C Cable Mode ]`.
+- **Live USB-C Cable Auto-Detection**: Automatically detects when a USB-C to USB-C cable is connected between MacBook and PC (`169.254.x.x`) and populates the IP field.
 
-```cmd
-npm install
-npm start
+---
+
+## 📁 Source Code Architecture
+
+```text
+WindowsReceiver/
+├── main.js                  # Electron Main Process, Window Management & IPC Handlers
+├── index.html               # Receiver UI & W3C WebCodecs GPU Video Renderer
+├── mcb_protocol_decoder.js  # MCB1 Binary Protocol Header Demuxer & Annex-B Parser
+├── obs_virtual_cam_bridge.py# Direct Windows Virtual Webcam Frame Socket Server
+├── package.json             # Electron Build Config & NSIS Installer Target
+├── icon.ico                 # Application System Icon
+├── logo.svg                 # Header Bar Logo
+└── build_windows_exe.sh     # Executable & NSIS Setup Installer Builder
 ```
 
-### 2. Connect to MacBook Stream (Wi-Fi or USB-C Cable)
-- **Wi-Fi Mode**: Click **Scan LAN** to automatically discover your MacBook camera stream, or type your MacBook IP address (e.g. `192.168.1.45`) and port (`8080`).
-- **USB-C Wired Mode (0ms Latency)**: Plug a USB-C to USB-C cable between MacBook and PC. macOS and Windows automatically establish a high-speed Thunderbolt / USB Ethernet link (e.g. `169.254.x.x`). Click **Scan LAN** or enter the USB IP address shown on Mac app.
-
-### 3. Enable System Virtual Webcam
-Click **Enable Direct System Webcam** to expose the stream as a system webcam device ("MacCam Bridge Camera") for Discord, Zoom, Teams, and OBS Studio.
-
 ---
 
-## Building Executable Installer (.exe)
+## 🛠️ Building Windows Executable & Setup Installer
 
-To build a standalone portable executable or NSIS installer:
+Package both **NSIS Setup Wizard Installers** (`MacCam-Bridge-Setup-Windows-x64-1.0.0.exe`) and Standalone Portable EXEs:
 
-```cmd
-npm run build:portable
+```bash
+./build_windows_exe.sh
 ```
-
-The output executable will be placed in the `dist/` directory (e.g. `dist/MacCam Bridge 1.0.0.exe`).
+The resulting executables will be output to the `dist/` directory.
