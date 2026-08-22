@@ -43,9 +43,11 @@ Windows PC (Receiver)
   - Created `VideoFrameConsumer` protocol abstraction for decoupling frame capture from encoding/streaming.
   - Added controlled diagnostic frame logging (frame index, dimensions, pixel format, timestamp, and FPS).
 - [x] **Hardware Encoding Foundation**: Configured VideoToolbox H.264 hardware encoder pipeline.
+- [x] **Hardware H.264 Video Decoder & Renderer**: Integrated VideoToolbox `VTDecompressionSession` decoder and low-latency `AVSampleBufferDisplayLayer` video renderer.
+- [x] **Local LAN Device Discovery**: Integrated mDNS / Bonjour network browsing (`NWBrowser` for `_maccambridge._tcp`) to auto-discover camera senders.
+- [x] **Polished Emoji-Free macOS UI**: Modern dark-mode Apple HIG interface using native SF Symbols, custom mode tab control, and dynamic live metrics.
 
 ### Next Planned Milestones
-- [ ] Local LAN device discovery (mDNS / Bonjour)
 - [ ] WebRTC peer connection & signaling pipeline
 - [ ] Windows receiver application
 - [ ] Windows native virtual webcam driver integration

@@ -33,7 +33,6 @@ yarn-error.log*
 # OS / Temporary
 *.tmp
 *.log
-MacCamBridge.xcodeproj/
 
 # Build outputs
 build_dmg/

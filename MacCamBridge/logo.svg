@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background Dark Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#18181B"/>
+      <stop offset="50%" stop-color="#09090B"/>
+      <stop offset="100%" stop-color="#040405"/>
+    </linearGradient>
+
+    <!-- Glowing Emerald Border -->
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34D399" stop-opacity="0.9"/>
+      <stop offset="50%" stop-color="#10B981" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#059669" stop-opacity="0.9"/>
+    </linearGradient>
+
+    <!-- Lens Outer Ring -->
+    <linearGradient id="lensRing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34D399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+
+    <!-- Glass Reflection Overlay -->
+    <linearGradient id="glassReflect" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.22"/>
+      <stop offset="40%" stop-color="#FFFFFF" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- Wireless Signal Waves Gradient -->
+    <linearGradient id="waveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#34D399"/>
+      <stop offset="100%" stop-color="#6EE7B7"/>
+    </linearGradient>
+  </defs>
+
+  <!-- App Icon Background Squircle (macOS standard squircle shape) -->
+  <rect x="32" y="32" width="448" height="448" rx="96" ry="96" fill="url(#bgGrad)"/>
+  <rect x="32" y="32" width="448" height="448" rx="96" ry="96" fill="none" stroke="url(#borderGrad)" stroke-width="4"/>
+
+  <!-- Background Decorative Aperture Ring -->
+  <circle cx="256" cy="256" r="175" fill="none" stroke="#27272A" stroke-width="2" stroke-dasharray="6 10"/>
+  
+  <!-- Outer Camera Lens Frame -->
+  <circle cx="256" cy="256" r="135" fill="#121215" stroke="url(#lensRing)" stroke-width="8"/>
+  <circle cx="256" cy="256" r="120" fill="#09090B" stroke="#27272A" stroke-width="2"/>
+
+  <!-- Inner Camera Iris & Optics -->
+  <circle cx="256" cy="256" r="92" fill="#040405"/>
+  <circle cx="256" cy="256" r="82" fill="none" stroke="#3F3F46" stroke-width="1.5"/>
+
+  <!-- Glowing Emerald Camera Sensor Core -->
+  <circle cx="256" cy="256" r="58" fill="url(#lensRing)" opacity="0.9"/>
+  <circle cx="256" cy="256" r="42" fill="#040405"/>
+  <circle cx="256" cy="256" r="28" fill="#10B981"/>
+  <circle cx="242" cy="242" r="9" fill="#A7F3D0" opacity="0.85"/>
+
+  <!-- Wireless Broadcast Bridge Waves (Top-Right Beam) -->
+  <path d="M 330 150 A 130 130 0 0 1 370 190" fill="none" stroke="url(#waveGrad)" stroke-width="7" stroke-linecap="round"/>
+  <path d="M 352 128 A 160 160 0 0 1 400 176" fill="none" stroke="url(#waveGrad)" stroke-width="7" stroke-linecap="round" opacity="0.75"/>
+  <path d="M 374 106 A 190 190 0 0 1 430 162" fill="none" stroke="url(#waveGrad)" stroke-width="7" stroke-linecap="round" opacity="0.45"/>
+
+  <!-- Wireless Broadcast Bridge Waves (Bottom-Left Beam) -->
+  <path d="M 182 362 A 130 130 0 0 1 142 322" fill="none" stroke="url(#waveGrad)" stroke-width="7" stroke-linecap="round"/>
+  <path d="M 160 384 A 160 160 0 0 1 112 336" fill="none" stroke="url(#waveGrad)" stroke-width="7" stroke-linecap="round" opacity="0.75"/>
+  <path d="M 138 406 A 190 190 0 0 1 82 350" fill="none" stroke="url(#waveGrad)" stroke-width="7" stroke-linecap="round" opacity="0.45"/>
+
+  <!-- Lens Glass Light Reflection Layer -->
+  <path d="M 32 128 C 32 75 75 32 128 32 L 384 32 C 437 32 480 75 480 128 L 480 196 L 32 316 Z" fill="url(#glassReflect)"/>
+</svg>
