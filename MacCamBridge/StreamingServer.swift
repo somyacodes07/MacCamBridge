@@ -49,7 +49,7 @@ final class StreamServer: NSObject, ObservableObject, EncodedFrameSink {
     }
 
     func start(
-        port: UInt16 = 8080
+        port preferredPort: UInt16 = 8080
     ) {
 
         queue.async { [weak self] in
@@ -62,62 +62,65 @@ final class StreamServer: NSObject, ObservableObject, EncodedFrameSink {
                 return
             }
 
-            guard
-                let nwPort = NWEndpoint.Port(
-                    rawValue: port
-                )
-            else {
-                print("Invalid server port")
+            for p in preferredPort...(preferredPort + 10) {
 
-                return
-            }
-
-            let currentIP = StreamServer.getLocalIPAddress()
-
-            do {
-                let parameters = NWParameters.tcp
-                parameters.allowLocalEndpointReuse = true
-
-                let webSocketOptions = NWProtocolWebSocket.Options()
-                parameters.defaultProtocolStack.applicationProtocols.insert(webSocketOptions, at: 0)
-
-                let listener = try NWListener(
-                    using: parameters,
-                    on: nwPort
-                )
-
-                listener.service = NWListener.Service(
-                    name: Host.current().localizedName ?? "MacBook Camera",
-                    type: "_maccambridge._tcp"
-                )
-
-                listener.newConnectionHandler = {
-                    [weak self] connection in
-
-                    self?.handleNewConnection(
-                        connection
+                guard
+                    let nwPort = NWEndpoint.Port(
+                        rawValue: p
                     )
+                else {
+                    continue
                 }
 
-                listener.stateUpdateHandler = {
-                    [weak self] state in
+                do {
+                    let parameters = NWParameters.tcp
+                    parameters.allowLocalEndpointReuse = true
 
-                    self?.handleListenerState(
-                        state
+                    let webSocketOptions = NWProtocolWebSocket.Options()
+                    parameters.defaultProtocolStack.applicationProtocols.insert(
+                        webSocketOptions,
+                        at: 0
                     )
+
+                    let listener = try NWListener(
+                        using: parameters,
+                        on: nwPort
+                    )
+
+                    listener.service = NWListener.Service(
+                        name: Host.current().localizedName ?? "MacBook Camera",
+                        type: "_maccambridge._tcp"
+                    )
+
+                    listener.newConnectionHandler = {
+                        [weak self] connection in
+
+                        self?.handleNewConnection(
+                            connection
+                        )
+                    }
+
+                    listener.stateUpdateHandler = {
+                        [weak self] state in
+
+                        self?.handleListenerState(
+                            state
+                        )
+                    }
+
+                    self.listener = listener
+
+                    listener.start(
+                        queue: self.queue
+                    )
+
+                    print("Stream listener binding on port \(p)")
+                    break
+
+                } catch {
+
+                    print("Port \(p) in use or failed, trying next port...")
                 }
-
-                self.listener = listener
-
-                listener.start(
-                    queue: self.queue
-                )
-
-            } catch {
-
-                print(
-                    "Failed to start stream server: \(error)"
-                )
             }
         }
     }
