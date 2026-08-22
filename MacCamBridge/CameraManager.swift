@@ -187,7 +187,7 @@ final class CameraManager: NSObject, ObservableObject {
             if let connection = output.connection(with: .video),
                connection.isVideoOrientationSupported {
 
-                connection.videoOrientation = .landscapeRight
+                connection.videoOrientation = .landscapeLeft
             }
 
             self.encoder = encoder
