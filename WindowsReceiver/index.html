@@ -791,9 +791,14 @@
             const annexBData = decoder.toAnnexB(packet);
             if (!annexBData || !videoDecoder) return;
 
+            if (packet.type === 1) {
+                return;
+            }
+
+            const isKey = packet.type === 2;
             const chunk = new EncodedVideoChunk({
-                type: packet.type === 2 ? 'key' : 'delta',
-                timestamp: packet.pts * 1000000,
+                type: isKey ? 'key' : 'delta',
+                timestamp: Math.max(0, Math.round(packet.pts * 1000000)),
                 data: annexBData
             });
 
