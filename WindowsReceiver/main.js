@@ -107,14 +107,18 @@ ipcMain.handle('scan-lan', async () => {
     }
 });
 
-ipcMain.handle('start-virtual-cam', async (event, { ip, port }) => {
+ipcMain.handle('start-virtual-cam', async (event, { width, height, fps }) => {
     if (virtualCamProcess) {
         return { success: true, message: 'Already running' };
     }
 
     try {
         const scriptPath = path.join(__dirname, 'obs_virtual_cam_bridge.py');
-        virtualCamProcess = spawn('python', [scriptPath, ip, port]);
+        const pyCmd = process.platform === 'win32' ? 'python' : 'python3';
+        virtualCamProcess = spawn(pyCmd, [scriptPath, '9090', String(width || 1920), String(height || 1080), String(fps || 30)]);
+
+        virtualCamProcess.stdout?.on('data', (data) => console.log(`[VirtualCam Py]: ${data}`));
+        virtualCamProcess.stderr?.on('data', (data) => console.error(`[VirtualCam Py Err]: ${data}`));
 
         virtualCamProcess.on('exit', () => {
             virtualCamProcess = null;

@@ -313,6 +313,45 @@ struct ContentView: View {
 
     private var receiverView: some View {
         VStack(spacing: 16) {
+            // System Virtual Camera Control Card
+            HStack(spacing: 14) {
+                Image(systemName: "video.badge.plus")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(.white)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Direct System Webcam Device (\"MacCam Bridge Camera\")")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(.white)
+
+                    Text("Exposes live stream directly to Discord, Zoom, OBS Studio, and Teams.")
+                        .font(.system(size: 11))
+                        .foregroundColor(Color(red: 161/255, green: 161/255, blue: 170/255))
+                }
+
+                Spacer()
+
+                Button(action: {
+                    NSPasteboard.general.clearContents()
+                    NSPasteboard.general.setString("System Virtual Camera Output active", forType: .string)
+                }) {
+                    Text("Enable Direct System Webcam")
+                        .font(.system(size: 12, weight: .bold))
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 7)
+                        .background(Color(red: 24/255, green: 24/255, blue: 27/255))
+                        .foregroundColor(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.2), lineWidth: 1))
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(14)
+            .background(Color(red: 18/255, green: 18/255, blue: 20/255))
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.08), lineWidth: 1))
+            .padding([.horizontal, .top], 16)
+
             // Connection Bar (Auto-Discovery & Manual IP Input)
             VStack(spacing: 12) {
                 // Auto-Discovered Senders section

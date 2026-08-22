@@ -930,28 +930,49 @@
             }
         }
 
+        let vcamSocket = null;
+        const netModule = (window.require ? window.require('net') : null);
+
         async function toggleVirtualCam() {
             const btn = document.getElementById('vcamToggleBtn');
-            const ip = document.getElementById('macIp').value.trim();
-            const port = document.getElementById('macPort').value.trim();
 
             if (!isVcamActive) {
                 if (ipcRenderer) {
-                    const res = await ipcRenderer.invoke('start-virtual-cam', { ip, port });
+                    const res = await ipcRenderer.invoke('start-virtual-cam', { width: 1920, height: 1080, fps: 30 });
                     if (res.success) {
                         isVcamActive = true;
                         btn.innerText = 'Disable System Webcam';
+                        btn.classList.add('btn-secondary');
+
+                        if (netModule) {
+                            setTimeout(() => {
+                                try {
+                                    vcamSocket = netModule.createConnection(9090, '127.0.0.1', () => {
+                                        console.log('[+] Connected to local Virtual Camera Python bridge on 9090');
+                                    });
+                                    vcamSocket.on('error', (e) => console.error('Virtual Cam socket error:', e));
+                                } catch (e) {
+                                    console.error('Failed to create Virtual Cam socket:', e);
+                                }
+                            }, 500);
+                        }
                     }
                 } else {
                     isVcamActive = true;
                     btn.innerText = 'Disable System Webcam';
+                    btn.classList.add('btn-secondary');
                 }
             } else {
+                if (vcamSocket) {
+                    vcamSocket.end();
+                    vcamSocket = null;
+                }
                 if (ipcRenderer) {
                     await ipcRenderer.invoke('stop-virtual-cam');
                 }
                 isVcamActive = false;
                 btn.innerText = 'Enable Direct System Webcam';
+                btn.classList.remove('btn-secondary');
             }
         }
 
@@ -1088,6 +1109,25 @@
 
                         ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
                         frame.close();
+
+                        // Stream RGB frame buffer to local pyvirtualcam bridge if active
+                        if (isVcamActive && vcamSocket && vcamSocket.writable && canvas.width > 0 && canvas.height > 0) {
+                            try {
+                                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                                const rgbBuffer = new Uint8Array(canvas.width * canvas.height * 3);
+                                let src = 0, dst = 0;
+                                for (let i = 0; i < canvas.width * canvas.height; i++) {
+                                    rgbBuffer[dst] = imgData.data[src];
+                                    rgbBuffer[dst+1] = imgData.data[src+1];
+                                    rgbBuffer[dst+2] = imgData.data[src+2];
+                                    src += 4;
+                                    dst += 3;
+                                }
+                                vcamSocket.write(rgbBuffer);
+                            } catch (e) {
+                                console.error('Virtual Cam write error:', e);
+                            }
+                        }
 
                         frameCount++;
                         const now = Date.now();
