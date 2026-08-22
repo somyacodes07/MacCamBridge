@@ -200,6 +200,12 @@ final class H264Encoder: VideoFrameConsumer {
 
         VTSessionSetProperty(
             session,
+            key: kVTCompressionPropertyKey_PrioritizeEncodingSpeedOverQuality,
+            value: kCFBooleanTrue
+        )
+
+        VTSessionSetProperty(
+            session,
             key: kVTCompressionPropertyKey_MaxKeyFrameIntervalDuration,
             value: NSNumber(value: 2)
         )

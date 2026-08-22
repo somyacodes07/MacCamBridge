@@ -76,6 +76,10 @@ final class StreamServer: NSObject, ObservableObject, EncodedFrameSink {
                     let parameters = NWParameters.tcp
                     parameters.allowLocalEndpointReuse = true
 
+                    if let tcpOptions = parameters.defaultProtocolStack.transportProtocol as? NWProtocolTCP.Options {
+                        tcpOptions.noDelay = true
+                    }
+
                     let webSocketOptions = NWProtocolWebSocket.Options()
                     parameters.defaultProtocolStack.applicationProtocols.insert(
                         webSocketOptions,

@@ -662,9 +662,25 @@
             }
         }
 
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedIp = localStorage.getItem('mcb_ip');
+            const savedPort = localStorage.getItem('mcb_port');
+            if (savedIp) document.getElementById('macIp').value = savedIp;
+            if (savedPort) document.getElementById('macPort').value = savedPort;
+
+            if (savedIp) {
+                setTimeout(() => {
+                    if (!isConnected) connect();
+                }, 400);
+            }
+        });
+
         function connect() {
             const ip = document.getElementById('macIp').value.trim();
             const port = document.getElementById('macPort').value.trim();
+            
+            localStorage.setItem('mcb_ip', ip);
+            localStorage.setItem('mcb_port', port);
 
             if (!ip || !port) {
                 alert('Please enter valid MacBook IP address and Port');
