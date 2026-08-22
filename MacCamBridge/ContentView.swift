@@ -62,9 +62,11 @@ struct ContentView: View {
                                 .stroke(Color.white.opacity(0.12), lineWidth: 1)
                         )
 
-                    Image(systemName: "video.fill")
-                        .font(.system(size: 17, weight: .bold))
-                        .foregroundColor(.white)
+                    Image("AppLogo")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 32, height: 32)
+                        .clipShape(RoundedRectangle(cornerRadius: 7))
                 }
 
                 VStack(alignment: .leading, spacing: 2) {

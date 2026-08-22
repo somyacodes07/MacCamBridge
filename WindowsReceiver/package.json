@@ -20,7 +20,9 @@
       "index.html",
       "mcb_protocol_decoder.js",
       "obs_virtual_cam_bridge.py",
-      "icon.ico"
+      "icon.ico",
+      "logo.svg",
+      "logo.png"
     ],
     "win": {
       "target": [

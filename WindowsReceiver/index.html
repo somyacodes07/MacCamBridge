@@ -34,6 +34,19 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        /* Hide all scrollbars across Windows app */
+        ::-webkit-scrollbar {
+            display: none !important;
+            width: 0px !important;
+            height: 0px !important;
+            background: transparent !important;
+        }
+
+        html, body, main, div {
+            -ms-overflow-style: none !important;
+            scrollbar-width: none !important;
+        }
+
         body {
             background-color: var(--bg-dark);
             color: var(--text-main);
@@ -41,6 +54,7 @@
             display: flex;
             flex-direction: column;
             user-select: none;
+            overflow-x: hidden;
         }
 
         /* Custom Windows Title Bar */
@@ -630,10 +644,7 @@
     <!-- Windows Custom Titlebar -->
     <div class="titlebar">
         <div class="titlebar-brand">
-            <svg viewBox="0 0 24 24">
-                <path d="M23 7l-7 5 7 5V7z"/>
-                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-            </svg>
+            <img src="logo.svg" width="20" height="20" alt="MacCam Bridge Logo" style="border-radius: 4px;">
             MacCam Bridge — Cross-Platform Suite
         </div>
         <div class="window-controls">
@@ -647,10 +658,7 @@
     <header>
         <div class="brand">
             <div class="brand-logo">
-                <svg viewBox="0 0 24 24">
-                    <path d="M23 7l-7 5 7 5V7z"/>
-                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-                </svg>
+                <img src="logo.svg" width="26" height="26" alt="MacCam Bridge Logo" style="border-radius: 6px;">
             </div>
             <div>
                 <div class="brand-title">MacCam Bridge</div>
