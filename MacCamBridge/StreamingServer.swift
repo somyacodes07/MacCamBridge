@@ -7,6 +7,7 @@ final class StreamServer: NSObject, ObservableObject, EncodedFrameSink {
     @Published private(set) var isRunning = false
     @Published private(set) var port: UInt16 = 8080
     @Published private(set) var clientCount = 0
+    @Published private(set) var localIP: String = "127.0.0.1"
 
     private let queue = DispatchQueue(
         label: "com.maccambridge.stream.server"
@@ -20,6 +21,32 @@ final class StreamServer: NSObject, ObservableObject, EncodedFrameSink {
     private var latestPPS: Data?
 
     private var frameCount = 0
+
+    static func getLocalIPAddress() -> String {
+        var address = "127.0.0.1"
+        var ifaddr: UnsafeMutablePointer<ifaddrs>?
+        guard getifaddrs(&ifaddr) == 0, let firstAddr = ifaddr else {
+            return address
+        }
+        for ptr in sequence(first: firstAddr, next: { $0.pointee.ifa_next }) {
+            let flags = Int32(ptr.pointee.ifa_flags)
+            let addr = ptr.pointee.ifa_addr.pointee
+            if (flags & (IFF_UP | IFF_RUNNING)) != 0 && (flags & IFF_LOOPBACK) == 0 {
+                if addr.sa_family == UInt8(AF_INET) {
+                    var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+                    if getnameinfo(ptr.pointee.ifa_addr, socklen_t(addr.sa_len), &hostname, socklen_t(hostname.count), nil, 0, NI_NUMERICHOST) == 0 {
+                        let ip = String(cString: hostname)
+                        if !ip.hasPrefix("127.") {
+                            address = ip
+                            break
+                        }
+                    }
+                }
+            }
+        }
+        freeifaddrs(ifaddr)
+        return address
+    }
 
     func start(
         port: UInt16 = 8080
@@ -45,9 +72,14 @@ final class StreamServer: NSObject, ObservableObject, EncodedFrameSink {
                 return
             }
 
+            let currentIP = StreamServer.getLocalIPAddress()
+
             do {
                 let parameters = NWParameters.tcp
                 parameters.allowLocalEndpointReuse = true
+
+                let webSocketOptions = NWProtocolWebSocket.Options()
+                parameters.defaultProtocolStack.applicationProtocols.insert(webSocketOptions, at: 0)
 
                 let listener = try NWListener(
                     using: parameters,
@@ -183,14 +215,17 @@ final class StreamServer: NSObject, ObservableObject, EncodedFrameSink {
             let actualPort =
                 listener?.port?.rawValue ?? 8080
 
+            let ip = StreamServer.getLocalIPAddress()
+
             DispatchQueue.main.async {
 
                 self.port = actualPort
+                self.localIP = ip
                 self.isRunning = true
             }
 
             print(
-                "Stream server running on port \(actualPort)"
+                "Stream server running on \(ip):\(actualPort)"
             )
 
         case .failed(let error):

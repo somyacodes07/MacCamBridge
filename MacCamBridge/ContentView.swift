@@ -131,10 +131,23 @@ private struct StreamStatusView: View {
             if server.isRunning {
 
                 Text(
-                    "● Server running on port \(server.port)"
+                    "● Server running on \(server.localIP):\(server.port)"
                 )
                 .foregroundStyle(
                     .green
+                )
+                .fontWeight(
+                    .semibold
+                )
+
+                Text(
+                    "Enter \(server.localIP) on Windows PC"
+                )
+                .foregroundStyle(
+                    .secondary
+                )
+                .font(
+                    .caption
                 )
 
                 Text(
