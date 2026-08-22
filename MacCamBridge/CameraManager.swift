@@ -192,7 +192,7 @@ final class CameraManager: NSObject, ObservableObject {
                 connection.isVideoOrientationSupported {
 
                 connection.videoOrientation =
-                    .landscapeRight
+                    .landscapeLeft
             }
 
             self.encoder = encoder
