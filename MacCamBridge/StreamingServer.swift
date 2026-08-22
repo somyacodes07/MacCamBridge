@@ -265,7 +265,8 @@ final class StreamServer: NSObject, ObservableObject, EncodedFrameSink {
 
         let client = Client(
             id: id,
-            connection: connection
+            connection: connection,
+            server: self
         )
 
         clients[id] = client
@@ -457,48 +458,17 @@ final class StreamServer: NSObject, ObservableObject, EncodedFrameSink {
         }
     }
 
+    func handleClientError(_ id: UUID) {
+        queue.async { [weak self] in
+            self?.removeClient(id)
+        }
+    }
+
     private func send(
         _ packet: StreamPacket,
         to client: Client
     ) {
-
-        let data = packet.encoded()
-
-        let metadata = NWProtocolWebSocket.Metadata(opcode: .binary)
-        let context = NWConnection.ContentContext(
-            identifier: "binaryFrame",
-            metadata: [metadata]
-        )
-
-        client.connection.send(
-            content: data,
-            contentContext: context,
-            isComplete: true,
-            completion: .contentProcessed {
-                [weak self, weak client] error in
-
-                if let error = error {
-
-                    print(
-                        "Send failed: \(error)"
-                    )
-
-                    guard
-                        let self = self,
-                        let client = client
-                    else {
-                        return
-                    }
-
-                    self.queue.async {
-
-                        self.removeClient(
-                            client.id
-                        )
-                    }
-                }
-            }
-        )
+        client.enqueue(packet: packet)
     }
 }
 
@@ -510,12 +480,69 @@ private final class Client {
     var isConnected = false
     var isStreaming = false
 
+    private var sendBuffer: [Data] = []
+    private var isSending = false
+    private let sendQueue = DispatchQueue(label: "com.maccambridge.client.send")
+
+    weak var server: StreamServer?
+
     init(
         id: UUID,
-        connection: NWConnection
+        connection: NWConnection,
+        server: StreamServer? = nil
     ) {
-
         self.id = id
         self.connection = connection
+        self.server = server
+    }
+
+    func enqueue(packet: StreamPacket) {
+        let data = packet.encoded()
+        sendQueue.async { [weak self] in
+            guard let self = self else { return }
+
+            // Prevent unbounded buffer growth during network congestion
+            if self.sendBuffer.count > 120 {
+                self.sendBuffer.removeFirst(30)
+            }
+
+            self.sendBuffer.append(data)
+            self.processQueue()
+        }
+    }
+
+    private func processQueue() {
+        guard !isSending, !sendBuffer.isEmpty else {
+            return
+        }
+
+        isSending = true
+        let data = sendBuffer.removeFirst()
+
+        let metadata = NWProtocolWebSocket.Metadata(opcode: .binary)
+        let context = NWConnection.ContentContext(
+            identifier: "binaryFrame",
+            metadata: [metadata]
+        )
+
+        connection.send(
+            content: data,
+            contentContext: context,
+            isComplete: true,
+            completion: .contentProcessed { [weak self] error in
+                guard let self = self else { return }
+
+                self.sendQueue.async {
+                    self.isSending = false
+
+                    if let error = error {
+                        print("Send error for client \(self.id): \(error)")
+                        self.server?.handleClientError(self.id)
+                    } else {
+                        self.processQueue()
+                    }
+                }
+            }
+        )
     }
 }
