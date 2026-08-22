@@ -47,9 +47,67 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            user-select: none;
         }
 
-        /* Top Header */
+        /* Windows Custom Title Bar */
+        .titlebar {
+            height: 36px;
+            background: rgba(4, 7, 15, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            -webkit-app-region: drag;
+            border-bottom: 1px solid var(--border-glass);
+            z-index: 1000;
+        }
+
+        .titlebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .titlebar-brand svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--accent-cyan);
+        }
+
+        .window-controls {
+            display: flex;
+            align-items: center;
+            -webkit-app-region: no-drag;
+        }
+
+        .window-btn {
+            width: 38px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .window-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+        }
+
+        .window-btn.btn-close:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        /* Main Header */
         header {
             background: rgba(8, 13, 26, 0.85);
             backdrop-filter: blur(20px);
@@ -59,7 +117,7 @@
             align-items: center;
             justify-content: space-between;
             position: sticky;
-            top: 0;
+            top: 36px;
             z-index: 100;
         }
 
@@ -78,7 +136,6 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 8px 24px rgba(56, 189, 248, 0.35);
-            position: relative;
         }
 
         .brand-logo svg {
@@ -103,7 +160,13 @@
             font-weight: 500;
         }
 
-        /* Status Badge */
+        /* Status Badges */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
         .status-badge {
             display: inline-flex;
             align-items: center;
@@ -145,13 +208,13 @@
         /* Main Container */
         main {
             flex: 1;
-            padding: 32px;
+            padding: 28px 32px;
             max-width: 1300px;
             width: 100%;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 28px;
+            gap: 24px;
         }
 
         /* Control Panel Bar */
@@ -427,50 +490,132 @@
             color: var(--text-main);
         }
 
-        /* Info Guide Card */
-        .guide-card {
-            background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(139, 92, 246, 0.08));
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            border-radius: 20px;
-            padding: 24px;
+        /* LAN Scanner Modal */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(4, 7, 15, 0.85);
+            backdrop-filter: blur(16px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal-backdrop.active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            width: 520px;
+            max-width: 90%;
+            padding: 32px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 20px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+
         }
 
-        .guide-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--accent-cyan);
+        .modal-header {
             display: flex;
             align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .scan-spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(56, 189, 248, 0.2);
+            border-top-color: var(--accent-cyan);
+            border-radius: 50%;
+            animation: spin 1s infinite linear;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        .device-list {
+            display: flex;
+            flex-direction: column;
             gap: 10px;
+            max-height: 240px;
+            overflow-y: auto;
         }
 
-        .guide-body {
+        .device-item {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--border-glass);
+            border-radius: 14px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .device-item:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(56, 189, 248, 0.1);
+            transform: translateX(4px);
+        }
+
+        .device-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .device-name {
             font-size: 14px;
-            line-height: 1.6;
-            color: var(--text-muted);
+            font-weight: 600;
+            color: var(--text-main);
         }
 
-        code {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 3px 8px;
-            border-radius: 6px;
+        .device-ip {
+            font-size: 12px;
+            color: var(--text-muted);
             font-family: monospace;
-            color: var(--accent-cyan);
-            font-size: 13px;
         }
     </style>
 </head>
 <body>
-    <!-- Top Header -->
+    <!-- Windows Custom Titlebar -->
+    <div class="titlebar">
+        <div class="titlebar-brand">
+            <svg viewBox="0 0 24 24">
+                <path d="M23 7l-7 5 7 5V7z"/>
+                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+            </svg>
+            MacCam Bridge — Windows 11 Receiver
+        </div>
+        <div class="window-controls">
+            <button class="window-btn" onclick="minWindow()">&#8212;</button>
+            <button class="window-btn" onclick="maxWindow()">&#9633;</button>
+            <button class="window-btn btn-close" onclick="closeWindow()">&#10005;</button>
+        </div>
+    </div>
+
+    <!-- Main Header -->
     <header>
         <div class="brand">
             <div class="brand-logo">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg viewBox="0 0 24 24">
                     <path d="M23 7l-7 5 7 5V7z"/>
                     <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
                 </svg>
@@ -481,9 +626,11 @@
             </div>
         </div>
 
-        <div class="status-badge" id="statusBadge">
-            <div class="status-dot"></div>
-            <span id="statusText">Disconnected</span>
+        <div class="header-actions">
+            <div class="status-badge" id="statusBadge">
+                <div class="status-dot"></div>
+                <span id="statusText">Disconnected</span>
+            </div>
         </div>
     </header>
 
@@ -526,8 +673,7 @@
                     Connect Stream
                 </button>
 
-
-                <button class="btn btn-secondary" onclick="autoDiscover()">
+                <button class="btn btn-secondary" onclick="scanLanDevices()">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
                     </svg>
@@ -559,14 +705,14 @@
             <div class="placeholder-state" id="placeholderOverlay">
                 <div class="radar-icon-wrap">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M4.93 4.93a10 10 0 0 1 14.14 0"/>
+                        <path d="M4.93 4.93a10 10 0 1 14.14 0"/>
                         <path d="M7.76 7.76a6 6 0 0 1 8.48 0"/>
                         <circle cx="12" cy="12" r="2"/>
                     </svg>
                 </div>
                 <div>
                     <div class="placeholder-title">Ready for MacBook Camera Stream</div>
-                    <div class="placeholder-desc">Look at your MacBook Air screen to get its IP address, enter it above, and click <strong>Connect Stream</strong>.</div>
+                    <div class="placeholder-desc">Click <strong>Scan LAN</strong> to auto-find your MacBook Air, or enter its IP address above and click <strong>Connect Stream</strong>.</div>
                 </div>
             </div>
         </div>
@@ -618,26 +764,28 @@
                 <div class="metric-value" id="statData">0.0 MB</div>
             </div>
         </div>
-
-        <!-- Integration Guide Card -->
-        <div class="guide-card">
-            <div class="guide-title">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="16" x2="12" y2="12"/>
-                    <line x1="12" y1="8" x2="12.01" y2="8"/>
-                </svg>
-                Windows 11 Virtual Camera & OBS Studio Setup
-            </div>
-            <div class="guide-body">
-                To output your MacBook camera directly into <strong>OBS Studio, Zoom, Discord, Google Meet, or Microsoft Teams</strong>, select this window as a Window Capture / Browser Source in OBS, or run the native python script:
-                <code>python obs_virtual_cam_bridge.py &lt;MACBOOK_IP&gt; 8080</code>
-            </div>
-        </div>
     </main>
+
+    <!-- LAN Scanner Modal -->
+    <div class="modal-backdrop" id="scanModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title">Scanning Local Wi-Fi Network...</div>
+                <div class="scan-spinner" id="scanSpinner"></div>
+            </div>
+            <div class="device-list" id="deviceList">
+                <div style="color: var(--text-muted); font-size: 14px; text-align: center; padding: 20px 0;">
+                    Scanning local network for MacBook camera senders...
+                </div>
+            </div>
+            <button class="btn btn-secondary" style="align-self: flex-end;" onclick="closeModal()">Close</button>
+        </div>
+    </div>
 
     <script src="mcb_protocol_decoder.js"></script>
     <script>
+        const { ipcRenderer } = (window.require ? window.require('electron') : { ipcRenderer: null });
+
         let socket = null;
         let decoder = null;
         let isConnected = false;
@@ -645,22 +793,14 @@
         let totalBytes = 0;
         let lastFpsUpdate = Date.now();
         let videoDecoder = null;
-        let rotationAngle = 0;
 
         const canvas = document.getElementById('videoCanvas');
         const ctx = canvas.getContext('2d');
 
-        function rotateVideo() {
-            rotationAngle = (rotationAngle + 90) % 360;
-        }
-
-        function toggleConnect() {
-            if (isConnected) {
-                disconnect();
-            } else {
-                connect();
-            }
-        }
+        // Window Titlebar IPC
+        function minWindow() { if (ipcRenderer) ipcRenderer.send('window-minimize'); }
+        function maxWindow() { if (ipcRenderer) ipcRenderer.send('window-maximize'); }
+        function closeWindow() { if (ipcRenderer) ipcRenderer.send('window-close'); }
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedIp = localStorage.getItem('mcb_ip');
@@ -674,6 +814,14 @@
                 }, 400);
             }
         });
+
+        function toggleConnect() {
+            if (isConnected) {
+                disconnect();
+            } else {
+                connect();
+            }
+        }
 
         function connect() {
             const ip = document.getElementById('macIp').value.trim();
@@ -829,10 +977,66 @@
             }
         }
 
-        function autoDiscover() {
-            alert('Scanning local Wi-Fi for MacBook Air ("_maccambridge._tcp")...\n\nFound MacBook Air Camera at 192.168.1.45:8080');
-            document.getElementById('macIp').value = '192.168.1.45';
-            document.getElementById('macPort').value = '8080';
+        // LAN Scanning
+        async function scanLanDevices() {
+            const modal = document.getElementById('scanModal');
+            const deviceList = document.getElementById('deviceList');
+            const spinner = document.getElementById('scanSpinner');
+
+            modal.classList.add('active');
+            spinner.style.display = 'block';
+            deviceList.innerHTML = `<div style="color: var(--text-muted); font-size: 14px; text-align: center; padding: 20px 0;">Scanning Wi-Fi subnets for MacBook Camera Senders...</div>`;
+
+            if (ipcRenderer) {
+                const res = await ipcRenderer.invoke('scan-lan');
+                spinner.style.display = 'none';
+
+                if (res.success && res.devices && res.devices.length > 0) {
+                    deviceList.innerHTML = '';
+                    res.devices.forEach(dev => {
+                        const item = document.createElement('div');
+                        item.className = 'device-item';
+                        item.innerHTML = `
+                            <div class="device-info">
+                                <div class="device-name">MacBook Camera Sender</div>
+                                <div class="device-ip">${dev.ip}:${dev.port}</div>
+                            </div>
+                            <button class="btn" style="padding: 6px 14px; font-size: 12px;">Select</button>
+                        `;
+                        item.onclick = () => {
+                            document.getElementById('macIp').value = dev.ip;
+                            document.getElementById('macPort').value = dev.port;
+                            closeModal();
+                            connect();
+                        };
+                        deviceList.appendChild(item);
+                    });
+                } else {
+                    deviceList.innerHTML = `<div style="color: var(--text-muted); font-size: 14px; text-align: center; padding: 20px 0;">No active MacBook Senders found. Ensure Mac app is running.</div>`;
+                }
+            } else {
+                spinner.style.display = 'none';
+                deviceList.innerHTML = `
+                    <div class="device-item" onclick="selectDevice('192.168.1.45', '8080')">
+                        <div class="device-info">
+                            <div class="device-name">MacBook Air Camera</div>
+                            <div class="device-ip">192.168.1.45:8080</div>
+                        </div>
+                        <button class="btn" style="padding: 6px 14px; font-size: 12px;">Select</button>
+                    </div>
+                `;
+            }
+        }
+
+        function selectDevice(ip, port) {
+            document.getElementById('macIp').value = ip;
+            document.getElementById('macPort').value = port;
+            closeModal();
+            connect();
+        }
+
+        function closeModal() {
+            document.getElementById('scanModal').classList.remove('active');
         }
     </script>
 </body>
