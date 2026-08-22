@@ -1016,6 +1016,15 @@
             statusText.innerText = 'Connecting...';
             connectBtn.disabled = true;
 
+            hasReceivedFirstKeyframe = false;
+
+            if (videoDecoder) {
+                try {
+                    videoDecoder.close();
+                } catch (e) {}
+                videoDecoder = null;
+            }
+
             decoder = new MCBProtocolDecoder();
             initHardwareDecoder();
 
@@ -1075,7 +1084,15 @@
                 socket.close();
                 socket = null;
             }
+            if (videoDecoder) {
+                try {
+                    videoDecoder.close();
+                } catch (e) {}
+                videoDecoder = null;
+            }
             isConnected = false;
+            hasReceivedFirstKeyframe = false;
+
             const statusBadge = document.getElementById('statusBadge');
             const statusText = document.getElementById('statusText');
             const connectBtn = document.getElementById('connectBtn');
@@ -1099,6 +1116,11 @@
 
         function initHardwareDecoder() {
             if ('VideoDecoder' in window) {
+                if (videoDecoder) {
+                    try { videoDecoder.close(); } catch (e) {}
+                    videoDecoder = null;
+                }
+
                 videoDecoder = new VideoDecoder({
                     output: (frame) => {
                         canvas.width = frame.displayWidth;
@@ -1159,6 +1181,16 @@
             }
 
             const isKey = packet.type === 2;
+
+            // Wait for initial H.264 Keyframe (IDR frame) before feeding delta frames to decoder
+            if (!hasReceivedFirstKeyframe) {
+                if (isKey) {
+                    hasReceivedFirstKeyframe = true;
+                } else {
+                    return; // Drop unreferencable delta frames to prevent pixelation/smearing
+                }
+            }
+
             const chunk = new EncodedVideoChunk({
                 type: isKey ? 'key' : 'delta',
                 timestamp: Math.max(0, Math.round(packet.pts * 1000000)),
@@ -1199,7 +1231,9 @@
                             document.getElementById('macIp').value = dev.ip;
                             document.getElementById('macPort').value = dev.port;
                             closeModal();
-                            connect();
+                            setTimeout(() => {
+                                connect();
+                            }, 250);
                         };
                         deviceList.appendChild(item);
                     });

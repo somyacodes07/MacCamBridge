@@ -25,12 +25,13 @@ function getLocalSubnets() {
     return [...new Set(subnets)];
 }
 
-async function scanLanPort(ip, port, timeout = 250) {
+async function scanLanPort(ip, port, timeout = 200) {
     return new Promise((resolve) => {
         const socket = new net.Socket();
         socket.setTimeout(timeout);
 
         socket.on('connect', () => {
+            socket.end();
             socket.destroy();
             resolve({ ip, port, status: 'open' });
         });
@@ -51,23 +52,24 @@ async function scanLanPort(ip, port, timeout = 250) {
 
 async function performLanScan() {
     const subnets = getLocalSubnets();
-    const ports = [8080, 8081, 8082, 8083, 8084, 8085];
+    const ports = [8080, 8081];
     const foundDevices = [];
-    const scanPromises = [];
 
     for (const subnet of subnets) {
-        for (let i = 1; i <= 254; i++) {
-            const ip = `${subnet}.${i}`;
-            for (const port of ports) {
-                scanPromises.push(scanLanPort(ip, port));
+        // Scan in batches of 32 IP addresses to prevent socket buffer contention
+        const batchSize = 32;
+        for (let i = 1; i <= 254; i += batchSize) {
+            const scanPromises = [];
+            for (let j = i; j < i + batchSize && j <= 254; j++) {
+                const ip = `${subnet}.${j}`;
+                for (const port of ports) {
+                    scanPromises.push(scanLanPort(ip, port));
+                }
             }
-        }
-    }
-
-    const results = await Promise.all(scanPromises);
-    for (const res of results) {
-        if (res) {
-            foundDevices.push(res);
+            const results = await Promise.all(scanPromises);
+            for (const res of results) {
+                if (res) foundDevices.push(res);
+            }
         }
     }
 
