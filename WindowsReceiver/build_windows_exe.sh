@@ -11,7 +11,7 @@ if [ ! -d "node_modules" ]; then
 fi
 
 echo "[*] Packaging Windows Executables & Installers with electron-builder..."
-npx electron-builder --win --config.win.target=portable
+npx electron-builder --win
 
 echo ""
 echo "[+] Windows Executable Build Complete!"

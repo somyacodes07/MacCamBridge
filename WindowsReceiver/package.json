@@ -26,9 +26,20 @@
     ],
     "win": {
       "target": [
-        "nsis",
-        "portable",
-        "zip"
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
       ],
       "icon": "icon.ico"
     },
@@ -37,10 +48,11 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "MacCam Bridge"
+      "shortcutName": "MacCam Bridge",
+      "artifactName": "MacCam-Bridge-Setup-Windows-${arch}-${version}.${ext}"
     },
     "portable": {
-      "artifactName": "${productName}-Windows-Portable-${version}.${ext}"
+      "artifactName": "MacCam-Bridge-Portable-Windows-${arch}-${version}.${ext}"
     }
   },
   "keywords": [

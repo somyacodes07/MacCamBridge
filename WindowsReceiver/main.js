@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Tray, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, Tray, Menu, nativeImage } = require('electron');
 const path = require('path');
 const os = require('os');
 const net = require('net');
@@ -56,7 +56,6 @@ async function performLanScan() {
     const foundDevices = [];
 
     for (const subnet of subnets) {
-        // Scan in batches of 32 IP addresses to prevent socket buffer contention
         const batchSize = 32;
         for (let i = 1; i <= 254; i += batchSize) {
             const scanPromises = [];
@@ -84,8 +83,9 @@ function createWindow() {
         minHeight: 650,
         title: "MacCam Bridge - Windows 11 Receiver",
         frame: false,
-        titleBarStyle: 'hidden',
-        backgroundColor: "#080d1a",
+        show: false,
+        backgroundColor: "#000000",
+        icon: path.join(__dirname, 'icon.ico'),
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false
@@ -94,12 +94,74 @@ function createWindow() {
 
     mainWindow.loadFile('index.html');
 
+    mainWindow.once('ready-to-show', () => {
+        mainWindow.show();
+        mainWindow.focus();
+    });
+
+    // Fallback force show
+    setTimeout(() => {
+        if (mainWindow && !mainWindow.isVisible()) {
+            mainWindow.show();
+        }
+    }, 1000);
+
     mainWindow.on('closed', () => {
         mainWindow = null;
     });
 }
 
-// IPC Event Handlers
+function createTray() {
+    try {
+        const iconPath = path.join(__dirname, 'icon.ico');
+        tray = new Tray(iconPath);
+
+        const contextMenu = Menu.buildFromTemplate([
+            {
+                label: 'Show MacCam Bridge',
+                click: () => {
+                    if (mainWindow) {
+                        mainWindow.show();
+                        mainWindow.focus();
+                    } else {
+                        createWindow();
+                    }
+                }
+            },
+            {
+                label: 'Minimize to Taskbar Tray',
+                click: () => {
+                    if (mainWindow) mainWindow.hide();
+                }
+            },
+            { type: 'separator' },
+            {
+                label: 'Quit MacCam Bridge',
+                click: () => {
+                    if (virtualCamProcess) virtualCamProcess.kill();
+                    app.quit();
+                }
+            }
+        ]);
+
+        tray.setToolTip('MacCam Bridge — Windows 11 Receiver');
+        tray.setContextMenu(contextMenu);
+
+        tray.on('double-click', () => {
+            if (mainWindow) {
+                if (mainWindow.isVisible()) {
+                    mainWindow.focus();
+                } else {
+                    mainWindow.show();
+                }
+            }
+        });
+    } catch (e) {
+        console.error('Failed to create system tray:', e);
+    }
+}
+
+// IPC Handlers
 ipcMain.handle('scan-lan', async () => {
     try {
         const devices = await performLanScan();
@@ -160,6 +222,7 @@ ipcMain.on('window-close', () => {
 
 app.whenReady().then(() => {
     createWindow();
+    createTray();
 
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) {
