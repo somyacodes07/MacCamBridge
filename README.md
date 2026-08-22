@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="MacCamBridge/Assets.xcassets/AppLogo.imageset/logo.png" width="128" height="128" alt="MacCam Bridge Logo">
+<img src="./WindowsReceiver/logo.svg" width="128" height="128" alt="MacCam Bridge Logo">
 
 # MacCam Bridge
 
