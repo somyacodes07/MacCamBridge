@@ -45,10 +45,12 @@
     },
     "nsis": {
       "oneClick": false,
+      "perMachine": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "MacCam Bridge",
+      "installerHeaderIcon": "icon.ico",
       "artifactName": "MacCam-Bridge-Setup-Windows-${arch}-${version}.${ext}"
     },
     "portable": {

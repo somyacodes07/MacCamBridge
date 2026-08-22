@@ -171,27 +171,123 @@ ipcMain.handle('scan-lan', async () => {
     }
 });
 
+function getUsbIpAddress() {
+    const interfaces = os.networkInterfaces();
+    for (const name of Object.keys(interfaces)) {
+        for (const iface of interfaces[name]) {
+            if (iface.family === 'IPv4' && !iface.internal) {
+                if (iface.address.startsWith('169.254.')) {
+                    return iface.address;
+                }
+            }
+        }
+    }
+    return null;
+}
+
+ipcMain.handle('get-usb-ip', async () => {
+    return { usbIp: getUsbIpAddress() };
+});
+
 ipcMain.handle('start-virtual-cam', async (event, { width, height, fps }) => {
     if (virtualCamProcess) {
         return { success: true, message: 'Already running' };
     }
 
-    try {
+    return new Promise((resolve) => {
         const scriptPath = path.join(__dirname, 'obs_virtual_cam_bridge.py');
-        const pyCmd = process.platform === 'win32' ? 'python' : 'python3';
-        virtualCamProcess = spawn(pyCmd, [scriptPath, '9090', String(width || 1920), String(height || 1080), String(fps || 30)]);
+        const commands = process.platform === 'win32' ? ['python', 'py', 'python3'] : ['python3', 'python'];
+        let cmdIndex = 0;
+        let lastErr = '';
 
-        virtualCamProcess.stdout?.on('data', (data) => console.log(`[VirtualCam Py]: ${data}`));
-        virtualCamProcess.stderr?.on('data', (data) => console.error(`[VirtualCam Py Err]: ${data}`));
+        function trySpawn() {
+            if (cmdIndex >= commands.length) {
+                resolve({ 
+                    success: false, 
+                    error: `Virtual camera launch failed (${lastErr}). Click 'Auto-Install Driver' to fix.` 
+                });
+                return;
+            }
 
-        virtualCamProcess.on('exit', () => {
-            virtualCamProcess = null;
-        });
+            const pyCmd = commands[cmdIndex++];
+            const proc = spawn(pyCmd, [scriptPath, '9090', String(width || 1920), String(height || 1080), String(fps || 30)]);
+            let hasStarted = false;
+            let stderrData = '';
 
-        return { success: true };
-    } catch (err) {
-        return { success: false, error: err.message };
-    }
+            proc.stderr?.on('data', (data) => {
+                const str = data.toString();
+                stderrData += str;
+                console.error(`[VirtualCam Py Err]: ${str}`);
+            });
+
+            proc.stdout?.on('data', (data) => {
+                const str = data.toString();
+                console.log(`[VirtualCam Py]: ${str}`);
+                if (str.includes('Virtual Cam Active') || str.includes('Listening')) {
+                    hasStarted = true;
+                    virtualCamProcess = proc;
+                    resolve({ success: true });
+                }
+            });
+
+            proc.on('error', (err) => {
+                lastErr = err.message;
+                trySpawn();
+            });
+
+            proc.on('exit', (code) => {
+                if (!hasStarted) {
+                    lastErr = stderrData || `Exited with code ${code}`;
+                    trySpawn();
+                } else {
+                    virtualCamProcess = null;
+                }
+            });
+
+            setTimeout(() => {
+                if (!hasStarted && proc.exitCode === null) {
+                    hasStarted = true;
+                    virtualCamProcess = proc;
+                    resolve({ success: true });
+                }
+            }, 1500);
+        }
+
+        trySpawn();
+    });
+});
+
+ipcMain.handle('install-vcam-deps', async () => {
+    return new Promise((resolve) => {
+        const commands = process.platform === 'win32' ? ['python', 'py', 'python3'] : ['python3', 'python'];
+        let cmdIndex = 0;
+
+        function tryInstall() {
+            if (cmdIndex >= commands.length) {
+                resolve({ success: false, error: 'Python not found on system PATH. Please install Python 3.10+ from python.org.' });
+                return;
+            }
+
+            const pyCmd = commands[cmdIndex++];
+            const proc = spawn(pyCmd, ['-m', 'pip', 'install', 'pyvirtualcam', 'opencv-python', 'numpy']);
+            let output = '';
+
+            proc.stdout?.on('data', d => output += d);
+            proc.stderr?.on('data', d => output += d);
+
+            proc.on('error', () => tryInstall());
+
+            proc.on('exit', (code) => {
+                if (code === 0) {
+                    resolve({ success: true, message: 'Virtual Camera driver dependencies installed successfully!' });
+                } else {
+                    tryInstall();
+                }
+            });
+        }
+
+        tryInstall();
+    });
 });
 
 ipcMain.handle('stop-virtual-cam', async () => {

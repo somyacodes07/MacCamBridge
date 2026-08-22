@@ -1298,12 +1298,78 @@
             }
         }
 
-        function selectDevice(ip, port) {
-            document.getElementById('macIp').value = ip;
-            document.getElementById('macPort').value = port;
-            closeModal();
-            connect();
+        async function toggleVirtualCam() {
+            const btn = document.getElementById('vcamBtn');
+            if (isVcamActive) {
+                if (ipcRenderer) await ipcRenderer.invoke('stop-virtual-cam');
+                if (vcamSocket) { vcamSocket.destroy(); vcamSocket = null; }
+                isVcamActive = false;
+                if (btn) {
+                    btn.classList.remove('active');
+                    btn.innerHTML = `
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 7l-7 5 7 5V7z"/>
+                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                        </svg>
+                        Enable Direct System Webcam
+                    `;
+                }
+            } else {
+                if (ipcRenderer) {
+                    const res = await ipcRenderer.invoke('start-virtual-cam', { width: canvas.width || 1920, height: canvas.height || 1080, fps: 30 });
+                    if (!res.success) {
+                        if (confirm(`Virtual Camera Driver Warning:\n${res.error}\n\nWould you like to auto-install the missing Python virtual camera driver dependencies now?`)) {
+                            installVcamDependencies();
+                        }
+                        return;
+                    }
+                }
+                vcamSocket = new net.Socket();
+                vcamSocket.connect(9090, '127.0.0.1', () => {
+                    isVcamActive = true;
+                    if (btn) {
+                        btn.classList.add('active');
+                        btn.innerHTML = `
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <rect x="6" y="6" width="12" height="12" rx="2"/>
+                            </svg>
+                            Stop System Webcam Driver
+                        `;
+                    }
+                });
+                vcamSocket.on('error', (err) => {
+                    console.error('vcamSocket error:', err);
+                });
+            }
         }
+
+        async function installVcamDependencies() {
+            if (!ipcRenderer) return;
+            alert('Installing Virtual Camera Driver dependencies (pyvirtualcam, opencv-python, numpy)... This may take 15-30 seconds.');
+            const res = await ipcRenderer.invoke('install-vcam-deps');
+            if (res.success) {
+                alert('Virtual Camera driver dependencies installed successfully! Click "Enable Direct System Webcam" to start.');
+            } else {
+                alert(`Driver Install Failed: ${res.error}\n\nPlease install Python 3.10+ from python.org and run:\npip install pyvirtualcam opencv-python numpy`);
+            }
+        }
+
+        // Periodic USB-C Cable Auto-Detection
+        setInterval(async () => {
+            if (ipcRenderer && currentMode === 'receiver') {
+                try {
+                    const res = await ipcRenderer.invoke('get-usb-ip');
+                    if (res && res.usbIp) {
+                        const hint = document.getElementById('transportHint');
+                        if (hint && !hint.innerHTML.includes('⚡ Detected')) {
+                            hint.innerHTML = `<b style="color: #ffffff;">⚡ USB-C Cable Detected:</b> Link-local IP <code>${res.usbIp}</code> is active! Auto-populated address.`;
+                            setTransportMode('usb');
+                            document.getElementById('macIp').value = res.usbIp;
+                        }
+                    }
+                } catch (e) {}
+            }
+        }, 3000);
 
         function closeModal() {
             document.getElementById('scanModal').classList.remove('active');
