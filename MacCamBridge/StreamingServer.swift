@@ -46,10 +46,17 @@ final class StreamServer: NSObject, ObservableObject, EncodedFrameSink {
             }
 
             do {
+                let parameters = NWParameters.tcp
+                parameters.allowLocalEndpointReuse = true
 
                 let listener = try NWListener(
-                    using: .tcp,
+                    using: parameters,
                     on: nwPort
+                )
+
+                listener.service = NWListener.Service(
+                    name: Host.current().localizedName ?? "MacBook Camera",
+                    type: "_maccambridge._tcp"
                 )
 
                 listener.newConnectionHandler = {

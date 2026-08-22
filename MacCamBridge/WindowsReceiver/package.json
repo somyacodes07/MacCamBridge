@@ -1,0 +1,24 @@
+{
+  "name": "maccam-bridge-windows-receiver",
+  "version": "1.0.0",
+  "description": "MacCam Bridge Windows Receiver - Low latency MacBook camera stream receiver for Windows 11",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "web": "npx http-server -p 8000"
+  },
+  "keywords": [
+    "maccam-bridge",
+    "webcam",
+    "streaming",
+    "h264",
+    "virtual-camera",
+    "obs",
+    "windows11"
+  ],
+  "author": "MacCam Bridge Team",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^29.0.0"
+  }
+}
