@@ -763,24 +763,13 @@
             if ('VideoDecoder' in window) {
                 videoDecoder = new VideoDecoder({
                     output: (frame) => {
-                        const isPortrait = frame.displayWidth < frame.displayHeight;
-                        canvas.width = isPortrait ? frame.displayHeight : frame.displayWidth;
-                        canvas.height = isPortrait ? frame.displayWidth : frame.displayHeight;
-
-                        const resText = `${canvas.width}x${canvas.height}`;
+                        canvas.width = frame.displayWidth;
+                        canvas.height = frame.displayHeight;
+                        const resText = `${frame.displayWidth}x${frame.displayHeight}`;
                         document.getElementById('statResolution').innerText = resText;
                         document.getElementById('overlayResolution').innerText = `${resText} HD`;
 
-                        if (isPortrait) {
-                            ctx.save();
-                            ctx.translate(canvas.width / 2, canvas.height / 2);
-                            ctx.rotate(90 * Math.PI / 180);
-                            ctx.drawImage(frame, -frame.displayWidth / 2, -frame.displayHeight / 2, frame.displayWidth, frame.displayHeight);
-                            ctx.restore();
-                        } else {
-                            ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
-                        }
-
+                        ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
                         frame.close();
 
                         frameCount++;

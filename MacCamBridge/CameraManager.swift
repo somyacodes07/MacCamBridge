@@ -133,8 +133,8 @@ final class CameraManager: NSObject, ObservableObject {
 
             let encoder =
                 H264Encoder(
-                    width: 1080,
-                    height: 1920,
+                    width: 1920,
+                    height: 1080,
                     fps: 30,
                     bitrate: 8_000_000
                 )
