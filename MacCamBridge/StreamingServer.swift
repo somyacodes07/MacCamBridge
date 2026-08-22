@@ -442,9 +442,15 @@ final class StreamServer: NSObject, ObservableObject, EncodedFrameSink {
 
         let data = packet.encoded()
 
+        let metadata = NWProtocolWebSocket.Metadata(opcode: .binary)
+        let context = NWConnection.ContentContext(
+            identifier: "binaryFrame",
+            metadata: [metadata]
+        )
+
         client.connection.send(
             content: data,
-            contentContext: .defaultMessage,
+            contentContext: context,
             isComplete: true,
             completion: .contentProcessed {
                 [weak self, weak client] error in
