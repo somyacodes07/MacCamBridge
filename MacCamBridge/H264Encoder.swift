@@ -203,12 +203,6 @@ final class H264Encoder: VideoFrameConsumer {
             key: kVTCompressionPropertyKey_MaxKeyFrameIntervalDuration,
             value: NSNumber(value: 1)
         )
-
-        VTSessionSetProperty(
-            session,
-            key: kVTCompressionPropertyKey_MaxKeyFrameIntervalDuration,
-            value: NSNumber(value: 2)
-        )
     }
 
     private static let outputCallback:

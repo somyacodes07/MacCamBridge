@@ -184,10 +184,16 @@ final class CameraManager: NSObject, ObservableObject {
                 return
             }
 
-            if let connection = output.connection(with: .video),
-               connection.isVideoOrientationSupported {
-
-                connection.videoOrientation = .portrait
+            if let connection = output.connection(with: .video) {
+                if #available(macOS 14.0, *) {
+                    if connection.isVideoRotationAngleSupported(0) {
+                        connection.videoRotationAngle = 0
+                    }
+                } else {
+                    if connection.isVideoOrientationSupported {
+                        connection.videoOrientation = .portrait
+                    }
+                }
             }
 
             self.encoder = encoder

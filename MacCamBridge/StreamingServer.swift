@@ -32,11 +32,12 @@ final class StreamServer: NSObject, ObservableObject, EncodedFrameSink {
         }
         for ptr in sequence(first: firstAddr, next: { $0.pointee.ifa_next }) {
             let flags = Int32(ptr.pointee.ifa_flags)
-            let addr = ptr.pointee.ifa_addr.pointee
+            guard let ifaAddr = ptr.pointee.ifa_addr else { continue }
+            let addr = ifaAddr.pointee
             if (flags & (IFF_UP | IFF_RUNNING)) != 0 && (flags & IFF_LOOPBACK) == 0 {
                 if addr.sa_family == UInt8(AF_INET) {
                     var hostname = [CChar](repeating: 0, count: Int(NI_MAXHOST))
-                    if getnameinfo(ptr.pointee.ifa_addr, socklen_t(addr.sa_len), &hostname, socklen_t(hostname.count), nil, 0, NI_NUMERICHOST) == 0 {
+                    if getnameinfo(ifaAddr, socklen_t(addr.sa_len), &hostname, socklen_t(hostname.count), nil, 0, NI_NUMERICHOST) == 0 {
                         let ip = String(cString: hostname)
                         if ip.hasPrefix("169.254.") {
                             usbIP = ip

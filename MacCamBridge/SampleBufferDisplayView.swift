@@ -17,9 +17,8 @@ final class SampleBufferView: NSView {
 
     private func setupLayer() {
         wantsLayer = true
-        displayLayer.videoGravity = .resizeAspectFill
-        displayLayer.frame = bounds
-        layer?.addSublayer(displayLayer)
+        layer = displayLayer
+        displayLayer.videoGravity = .resizeAspect
     }
 
     override func layout() {
@@ -28,14 +27,25 @@ final class SampleBufferView: NSView {
     }
 
     func enqueue(_ sampleBuffer: CMSampleBuffer) {
-        if displayLayer.status == .failed {
-            displayLayer.flush()
+        if #available(macOS 15.0, *) {
+            if displayLayer.sampleBufferRenderer.status == .failed {
+                displayLayer.sampleBufferRenderer.flush()
+            }
+            displayLayer.sampleBufferRenderer.enqueue(sampleBuffer)
+        } else {
+            if displayLayer.status == .failed {
+                displayLayer.flush()
+            }
+            displayLayer.enqueue(sampleBuffer)
         }
-        displayLayer.enqueue(sampleBuffer)
     }
 
     func flush() {
-        displayLayer.flush()
+        if #available(macOS 15.0, *) {
+            displayLayer.sampleBufferRenderer.flush()
+        } else {
+            displayLayer.flush()
+        }
     }
 }
 

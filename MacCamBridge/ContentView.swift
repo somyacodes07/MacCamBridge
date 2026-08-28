@@ -398,11 +398,12 @@ struct ContentView: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 8) {
                                 ForEach(bonjour.discoveredSenders) { sender in
+                                    let isSelected = receiver.currentEndpointDescription == sender.name && (receiver.isConnected || receiver.isConnecting)
                                     Button(action: {
-                                        receiver.connect(endpoint: sender.endpoint)
+                                        receiver.connect(endpoint: sender.endpoint, customDescription: sender.name)
                                     }) {
                                         HStack(spacing: 6) {
-                                            Image(systemName: "video.fill")
+                                            Image(systemName: isSelected ? "checkmark.circle.fill" : "video.fill")
                                                 .font(.system(size: 11))
 
                                             Text(sender.name)
@@ -410,12 +411,12 @@ struct ContentView: View {
                                         }
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 6)
-                                        .background(Color(red: 39/255, green: 39/255, blue: 42/255))
-                                        .foregroundColor(.white)
+                                        .background(isSelected ? Color.white : Color(red: 39/255, green: 39/255, blue: 42/255))
+                                        .foregroundColor(isSelected ? .black : .white)
                                         .clipShape(RoundedRectangle(cornerRadius: 8))
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 8)
-                                                .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                                                .stroke(isSelected ? Color.white : Color.white.opacity(0.2), lineWidth: 1)
                                         )
                                     }
                                     .buttonStyle(.plain)
@@ -447,6 +448,9 @@ struct ContentView: View {
                                 .textFieldStyle(.plain)
                                 .font(.system(size: 13, weight: .medium, design: .monospaced))
                                 .foregroundColor(.white)
+                                .onSubmit {
+                                    performManualConnect()
+                                }
                         }
                     }
                     .padding(.horizontal, 12)
@@ -470,6 +474,9 @@ struct ContentView: View {
                                 .font(.system(size: 13, weight: .medium, design: .monospaced))
                                 .foregroundColor(.white)
                                 .frame(width: 60)
+                                .onSubmit {
+                                    performManualConnect()
+                                }
                         }
                     }
                     .padding(.horizontal, 12)
@@ -480,11 +487,27 @@ struct ContentView: View {
 
                     Spacer()
 
-                    if !receiver.isConnected {
-                        Button(action: {
-                            if let port = UInt16(receiverPort) {
-                                receiver.connect(ip: receiverIP, port: port)
+                    if receiver.isConnecting {
+                        Button(action: { receiver.disconnect() }) {
+                            HStack(spacing: 8) {
+                                ProgressView()
+                                    .scaleEffect(0.7)
+                                    .frame(width: 14, height: 14)
+
+                                Text("Connecting...")
+                                    .font(.system(size: 13, weight: .bold))
                             }
+                            .padding(.horizontal, 22)
+                            .padding(.vertical, 10)
+                            .background(Color(red: 39/255, green: 39/255, blue: 42/255))
+                            .foregroundColor(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                            .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.white.opacity(0.2), lineWidth: 1))
+                        }
+                        .buttonStyle(.plain)
+                    } else if !receiver.isConnected {
+                        Button(action: {
+                            performManualConnect()
                         }) {
                             HStack(spacing: 8) {
                                 Image(systemName: "play.fill")
@@ -542,7 +565,23 @@ struct ContentView: View {
                             .stroke(Color.white.opacity(0.12), lineWidth: 1)
                     )
 
-                if !receiver.isConnected {
+                if receiver.isConnecting {
+                    VStack(spacing: 14) {
+                        ProgressView()
+                            .scaleEffect(1.3)
+                            .padding(.bottom, 4)
+
+                        VStack(spacing: 4) {
+                            Text("Connecting to Camera Stream...")
+                                .font(.system(size: 17, weight: .bold))
+                                .foregroundColor(.white)
+
+                            Text(receiver.statusText)
+                                .font(.system(size: 12))
+                                .foregroundColor(Color(red: 161/255, green: 161/255, blue: 170/255))
+                        }
+                    }
+                } else if !receiver.isConnected {
                     VStack(spacing: 14) {
                         ZStack {
                             Circle()
@@ -550,19 +589,27 @@ struct ContentView: View {
                                 .frame(width: 80, height: 80)
                                 .overlay(Circle().stroke(Color.white.opacity(0.08), lineWidth: 1))
 
-                            Image(systemName: "antenna.radiowaves.left.and.right")
+                            Image(systemName: receiver.errorMessage != nil ? "exclamationmark.triangle.fill" : "antenna.radiowaves.left.and.right")
                                 .font(.system(size: 34))
-                                .foregroundColor(.white)
+                                .foregroundColor(receiver.errorMessage != nil ? Color(red: 239/255, green: 68/255, blue: 68/255) : .white)
                         }
 
-                        VStack(spacing: 4) {
-                            Text("Ready to Receive Stream")
+                        VStack(spacing: 6) {
+                            Text(receiver.errorMessage != nil ? "Connection Error" : "Ready to Receive Stream")
                                 .font(.system(size: 17, weight: .bold))
                                 .foregroundColor(.white)
 
-                            Text("Select an auto-discovered camera or enter camera sender IP and port above")
-                                .font(.system(size: 12))
-                                .foregroundColor(Color(red: 161/255, green: 161/255, blue: 170/255))
+                            if let error = receiver.errorMessage {
+                                Text(error)
+                                    .font(.system(size: 12))
+                                    .foregroundColor(Color(red: 248/255, green: 113/255, blue: 113/255))
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal, 32)
+                            } else {
+                                Text("Select an auto-discovered camera or enter camera sender IP and port above")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(Color(red: 161/255, green: 161/255, blue: 170/255))
+                            }
                         }
                     }
                 } else {
@@ -616,6 +663,35 @@ struct ContentView: View {
             .padding([.horizontal, .bottom], 16)
         }
     }
+
+    private func performManualConnect() {
+        var ip = receiverIP.trimmingCharacters(in: .whitespacesAndNewlines)
+        if ip.hasPrefix("ws://") {
+            ip = String(ip.dropFirst(5))
+        } else if ip.hasPrefix("wss://") {
+            ip = String(ip.dropFirst(6))
+        } else if ip.hasPrefix("http://") {
+            ip = String(ip.dropFirst(7))
+        } else if ip.hasPrefix("https://") {
+            ip = String(ip.dropFirst(8))
+        }
+
+        var portVal: UInt16 = 8080
+        if let colonIdx = ip.firstIndex(of: ":") {
+            let hostStr = String(ip[..<colonIdx])
+            let portStr = String(ip[ip.index(after: colonIdx)...])
+            ip = hostStr
+            receiverIP = hostStr
+            if let parsedPort = UInt16(portStr) {
+                portVal = parsedPort
+                receiverPort = String(parsedPort)
+            }
+        } else if let portNum = UInt16(receiverPort.trimmingCharacters(in: .whitespacesAndNewlines)) {
+            portVal = portNum
+        }
+
+        receiver.connect(ip: ip, port: portVal)
+    }
 }
 
 extension View {
@@ -661,6 +737,8 @@ struct EdgeBorder: Shape {
     }
 }
 
-#Preview {
-    ContentView()
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
 }

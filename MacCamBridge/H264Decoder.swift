@@ -54,7 +54,7 @@ final class H264Decoder {
 
         let destinationPixelBufferAttributes: [String: Any] = [
             kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange,
-            kCVPixelBufferOpenGLCompatibilityKey as String: true
+            kCVPixelBufferMetalCompatibilityKey as String: true
         ]
 
         var outputCallback = VTDecompressionOutputCallbackRecord(
@@ -88,18 +88,36 @@ final class H264Decoder {
 
             var blockBuffer: CMBlockBuffer?
             let bufferStatus = nalData.withUnsafeBytes { rawBuffer -> OSStatus in
-                guard let baseAddress = rawBuffer.baseAddress else { return kCMBlockBufferNoErr }
-                return CMBlockBufferCreateWithMemoryBlock(
+                guard let baseAddress = rawBuffer.baseAddress else { return -1 }
+                
+                var createdBuffer: CMBlockBuffer?
+                let createStatus = CMBlockBufferCreateWithMemoryBlock(
                     allocator: kCFAllocatorDefault,
-                    memoryBlock: UnsafeMutableRawPointer(mutating: baseAddress),
+                    memoryBlock: nil,
                     blockLength: nalData.count,
-                    blockAllocator: kCFAllocatorNull,
+                    blockAllocator: kCFAllocatorDefault,
                     customBlockSource: nil,
                     offsetToData: 0,
                     dataLength: nalData.count,
                     flags: 0,
-                    blockBufferOut: &blockBuffer
+                    blockBufferOut: &createdBuffer
                 )
+                
+                guard createStatus == kCMBlockBufferNoErr, let created = createdBuffer else {
+                    return createStatus
+                }
+                
+                let copyStatus = CMBlockBufferReplaceDataBytes(
+                    with: baseAddress,
+                    blockBuffer: created,
+                    offsetIntoDestination: 0,
+                    dataLength: nalData.count
+                )
+                
+                if copyStatus == kCMBlockBufferNoErr {
+                    blockBuffer = created
+                }
+                return copyStatus
             }
 
             guard bufferStatus == kCMBlockBufferNoErr, let bBuffer = blockBuffer else {
@@ -141,19 +159,28 @@ final class H264Decoder {
                 flags: flags,
                 infoFlagsOut: &flagOut,
                 outputHandler: { [weak self] status, infoFlags, imageBuffer, presentationTimeStamp, presentationDuration in
-                    guard status == noErr, let imageBuffer = imageBuffer else { return }
+                    guard status == noErr, let imageBuffer = imageBuffer else {
+                        if status != noErr {
+                            print("H264Decoder: Frame decompression failed with error \(status)")
+                        }
+                        return
+                    }
 
                     var timing = CMSampleTimingInfo(
-                        duration: presentationDuration,
+                        duration: presentationDuration.isValid ? presentationDuration : .invalid,
                         presentationTimeStamp: presentationTimeStamp,
                         decodeTimeStamp: .invalid
                     )
                     var formatDesc: CMVideoFormatDescription?
-                    CMVideoFormatDescriptionCreateForImageBuffer(allocator: kCFAllocatorDefault, imageBuffer: imageBuffer, formatDescriptionOut: &formatDesc)
+                    let descStatus = CMVideoFormatDescriptionCreateForImageBuffer(
+                        allocator: kCFAllocatorDefault,
+                        imageBuffer: imageBuffer,
+                        formatDescriptionOut: &formatDesc
+                    )
 
-                    if let formatDesc = formatDesc {
+                    if descStatus == noErr, let formatDesc = formatDesc {
                         var decodedSampleBuffer: CMSampleBuffer?
-                        CMSampleBufferCreateForImageBuffer(
+                        let sampleStatus = CMSampleBufferCreateForImageBuffer(
                             allocator: kCFAllocatorDefault,
                             imageBuffer: imageBuffer,
                             dataReady: true,
@@ -164,7 +191,20 @@ final class H264Decoder {
                             sampleBufferOut: &decodedSampleBuffer
                         )
 
-                        if let decodedBuffer = decodedSampleBuffer {
+                        if sampleStatus == noErr, let decodedBuffer = decodedSampleBuffer {
+                            // Ensure AVSampleBufferDisplayLayer displays immediately without waiting on an external timebase
+                            if let attachmentsArray = CMSampleBufferGetSampleAttachmentsArray(decodedBuffer, createIfNecessary: true) {
+                                let count = CFArrayGetCount(attachmentsArray)
+                                for i in 0..<count {
+                                    let dict = unsafeBitCast(CFArrayGetValueAtIndex(attachmentsArray, i), to: CFMutableDictionary.self)
+                                    CFDictionarySetValue(
+                                        dict,
+                                        Unmanaged.passUnretained(kCMSampleAttachmentKey_DisplayImmediately).toOpaque(),
+                                        Unmanaged.passUnretained(kCFBooleanTrue).toOpaque()
+                                    )
+                                }
+                            }
+
                             self?.onDecodedFrame?(decodedBuffer)
                         }
                     }
