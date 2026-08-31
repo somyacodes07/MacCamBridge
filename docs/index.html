@@ -1073,7 +1073,7 @@
             <div class="hero-badge-container">
                 <div class="pill-badge">
                     <span class="pulse-dot"></span>
-                    <span>v1.0.0 Stable Release • Ultra-Low Latency Pipeline</span>
+                    <span id="hero-release-tag">v1.0.0 Stable Release • Ultra-Low Latency Pipeline</span>
                 </div>
             </div>
 
@@ -1523,30 +1523,47 @@
             }, 2000);
         }
 
-        // Fetch latest release asset links from GitHub API
+        // Fetch latest release asset links and tags from GitHub API
         async function fetchLatestReleaseAssets() {
-            try {
-                const res = await fetch('https://api.github.com/repos/somyacodes07/maccambridge/releases/latest');
-                if (!res.ok) return;
-                const release = await res.json();
-                
-                if (release.assets && release.assets.length > 0) {
-                    for (const asset of release.assets) {
-                        const name = asset.name.toLowerCase();
-                        if (name.endsWith('.dmg')) {
-                            const macBtn = document.getElementById('btn-download-mac');
-                            if (macBtn) macBtn.href = asset.browser_download_url;
-                        } else if (name.includes('setup') && name.endsWith('.exe')) {
-                            const winBtn = document.getElementById('btn-download-win');
-                            if (winBtn) winBtn.href = asset.browser_download_url;
-                        } else if (name.includes('portable') && name.endsWith('.exe')) {
-                            const portBtn = document.getElementById('btn-download-portable');
-                            if (portBtn) portBtn.href = asset.browser_download_url;
+            const repoCandidates = [
+                'https://api.github.com/repos/somyacodes07/MacCamBridge/releases/latest',
+                'https://api.github.com/repos/somyacodes07/maccambridge/releases/latest'
+            ];
+
+            for (const endpoint of repoCandidates) {
+                try {
+                    const res = await fetch(endpoint);
+                    if (!res.ok) continue;
+                    const release = await res.json();
+                    
+                    // Dynamically update hero tag
+                    if (release.tag_name) {
+                        const tagSpan = document.getElementById('hero-release-tag');
+                        if (tagSpan) {
+                            tagSpan.textContent = `${release.tag_name} Stable Release • Ultra-Low Latency Pipeline`;
                         }
                     }
+
+                    // Dynamically update asset download buttons
+                    if (release.assets && release.assets.length > 0) {
+                        for (const asset of release.assets) {
+                            const name = asset.name.toLowerCase();
+                            if (name.endsWith('.dmg')) {
+                                const macBtn = document.getElementById('btn-download-mac');
+                                if (macBtn) macBtn.href = asset.browser_download_url;
+                            } else if (name.includes('setup') && name.endsWith('.exe')) {
+                                const winBtn = document.getElementById('btn-download-win');
+                                if (winBtn) winBtn.href = asset.browser_download_url;
+                            } else if (name.includes('portable') && name.endsWith('.exe')) {
+                                const portBtn = document.getElementById('btn-download-portable');
+                                if (portBtn) portBtn.href = asset.browser_download_url;
+                            }
+                        }
+                    }
+                    break;
+                } catch (e) {
+                    console.log('Using standard releases fallback URLs');
                 }
-            } catch (e) {
-                console.log('Using standard releases fallback URLs');
             }
         }
 
