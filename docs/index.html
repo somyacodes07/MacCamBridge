@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MacCam Bridge — Broadcast MacBook Camera to Windows at 1080p60 &lt;5ms</title>
+    <meta name="description" content="Turn your MacBook's Studio Quality FaceTime HD / Continuity Camera into an ultra-low latency direct webcam on Windows 10/11 over Wi-Fi or USB-C.">
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #000000;
+            --bg-surface: #09090b;
+            --bg-card: #121215;
+            --bg-card-hover: #18181c;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-highlight: rgba(255, 255, 255, 0.18);
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --accent-white: #ffffff;
+            --accent-glow: rgba(255, 255, 255, 0.12);
+            --badge-green: #22c55e;
+            --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.07) 0%, transparent 60%),
+                radial-gradient(circle at 10% 40%, rgba(255, 255, 255, 0.03) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 40%);
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Navigation Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            background: rgba(9, 9, 11, 0.8);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 72px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.15rem;
+            letter-spacing: -0.02em;
+        }
+
+        .brand-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-github {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .btn-github:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--border-highlight);
+            transform: translateY(-1px);
+        }
+
+        .btn-download-nav {
+            padding: 8px 18px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            background: #ffffff;
+            color: #000000;
+            transition: all 0.2s ease;
+        }
+
+        .btn-download-nav:hover {
+            background: #e4e4e7;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 90px 0 60px;
+            text-align: center;
+            position: relative;
+        }
+
+        .pill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-highlight);
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--badge-green);
+            box-shadow: 0 0 10px var(--badge-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4.2rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            margin-bottom: 20px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 680px;
+            margin: 0 auto 36px;
+            line-height: 1.6;
+        }
+
+        .hero-cta {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 50px;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: #ffffff;
+            color: #000000;
+            font-weight: 700;
+            font-size: 1rem;
+            border-radius: 12px;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: #f4f4f5;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 26px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+            transition: all 0.25s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-highlight);
+            transform: translateY(-2px);
+        }
+
+        /* Metric Badges */
+        .metric-bar {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin-bottom: 60px;
+        }
+
+        .metric-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 18px;
+            background: rgba(18, 18, 21, 0.6);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .metric-item strong {
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+        }
+
+        /* App Preview Mockup Window */
+        .preview-window {
+            max-width: 960px;
+            margin: 0 auto 100px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-highlight);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(255, 255, 255, 0.05);
+        }
+
+        .window-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            background: #121215;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .window-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+        }
+
+        .dot-red { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #27c93f; }
+
+        .window-title {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        .window-body {
+            padding: 24px;
+            background: #000000;
+        }
+
+        .mockup-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .mockup-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .mockup-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .panel-badge {
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            padding: 4px 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            color: var(--text-secondary);
+        }
+
+        .screen-placeholder {
+            height: 220px;
+            background: #000000;
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .screen-overlay-top {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+        }
+
+        .live-tag {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--border-subtle);
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-pill {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--border-subtle);
+            padding: 4px 8px;
+            border-radius: 6px;
+            color: var(--text-secondary);
+        }
+
+        .panel-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+        }
+
+        /* Section Titles */
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-tag {
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 3.5vw, 2.8rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+        }
+
+        .section-subtitle {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Download Section */
+        .download-section {
+            padding: 80px 0;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+        }
+
+        .download-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .download-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-card:hover {
+            border-color: var(--border-highlight);
+            transform: translateY(-4px);
+            background: var(--bg-card-hover);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .card-top {
+            margin-bottom: 28px;
+        }
+
+        .card-os-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .card-os-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: #ffffff;
+        }
+
+        .card-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.01em;
+        }
+
+        .card-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .card-features {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-subtle);
+            padding-top: 16px;
+        }
+
+        .card-features li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-features li svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--badge-green);
+            flex-shrink: 0;
+        }
+
+        .btn-card-download {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            background: #ffffff;
+            color: #000000;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .btn-card-download:hover {
+            background: #e4e4e7;
+            transform: scale(1.02);
+        }
+
+        .btn-card-download.secondary-btn {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .btn-card-download.secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--border-highlight);
+        }
+
+        .card-meta {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 10px;
+            font-family: var(--font-mono);
+        }
+
+        /* Bypass Security Guide Section */
+        .bypass-section {
+            padding: 100px 0;
+            border-top: 1px solid var(--border-subtle);
+            background: var(--bg-surface);
+        }
+
+        .guide-box {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .guide-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-subtle);
+            background: #09090b;
+        }
+
+        .guide-tab {
+            flex: 1;
+            padding: 18px 24px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .guide-tab.active {
+            color: #ffffff;
+            border-bottom-color: #ffffff;
+            background: var(--bg-card);
+        }
+
+        .guide-content {
+            padding: 36px;
+            display: none;
+        }
+
+        .guide-content.active {
+            display: block;
+        }
+
+        .guide-step {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .step-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-highlight);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .step-info h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .step-info p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .terminal-block {
+            background: #000000;
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 14px 18px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-subtle);
+            color: #ffffff;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-family: var(--font-sans);
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 100px 0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--border-highlight);
+            transform: translateY(-3px);
+            background: var(--bg-card-hover);
+        }
+
+        .feature-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .feature-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: #ffffff;
+        }
+
+        .feature-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .feature-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid var(--border-subtle);
+            padding: 60px 0 40px;
+            background: #000000;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .footer-links a:hover {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="container nav-inner">
+            <a href="#" class="brand">
+                <div class="brand-logo">
+                    <img src="logo.svg" alt="MacCam Bridge Logo">
+                </div>
+                <span>MacCam Bridge</span>
+            </a>
+
+            <nav class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#downloads">Downloads</a>
+                <a href="#bypass-guide">Security Bypass</a>
+                <a href="https://github.com/somyacodes07/maccambridge" target="_blank">Documentation</a>
+            </nav>
+
+            <div class="nav-actions">
+                <a href="https://github.com/somyacodes07/maccambridge" target="_blank" class="btn-github">
+                    <svg height="18" width="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+                    GitHub
+                </a>
+                <a href="#downloads" class="btn-download-nav">Get App</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="pill-badge">
+                <span class="pulse-dot"></span>
+                <span>Open Source • Ultra-Low Latency Video Bridge</span>
+            </div>
+
+            <h1>
+                Broadcast your Mac Camera to<br>
+                <span>Windows 10/11 at 1080p60 &lt;5ms.</span>
+            </h1>
+
+            <p>
+                Turn your MacBook's Studio Quality FaceTime HD / 4K Continuity Camera into a native, direct virtual webcam on Windows over Wi-Fi 6 or peer-to-peer USB-C link.
+            </p>
+
+            <div class="hero-cta">
+                <a href="#downloads" class="btn-primary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Download MacCam Bridge
+                </a>
+                <a href="#bypass-guide" class="btn-secondary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    First-Launch Security Guide
+                </a>
+            </div>
+
+            <div class="metric-bar">
+                <div class="metric-item">
+                    <span>Latency:</span>
+                    <strong>&lt; 5ms (Sub-frame)</strong>
+                </div>
+                <div class="metric-item">
+                    <span>Encoding:</span>
+                    <strong>Hardware VideoToolbox H.264</strong>
+                </div>
+                <div class="metric-item">
+                    <span>Wired Link:</span>
+                    <strong>40 Gbps USB-C Thunderbolt</strong>
+                </div>
+                <div class="metric-item">
+                    <span>Apps Supported:</span>
+                    <strong>Discord, Zoom, OBS, Teams</strong>
+                </div>
+            </div>
+
+            <!-- Interactive App Preview Window -->
+            <div class="preview-window">
+                <div class="window-header">
+                    <div class="window-dots">
+                        <span class="dot dot-red"></span>
+                        <span class="dot dot-yellow"></span>
+                        <span class="dot dot-green"></span>
+                    </div>
+                    <div class="window-title">MacCam Bridge — Studio Broadcast Pipeline</div>
+                    <div style="width: 40px;"></div>
+                </div>
+                <div class="window-body">
+                    <div class="mockup-grid">
+                        <!-- macOS Sender Mockup -->
+                        <div class="mockup-panel">
+                            <div class="panel-header">
+                                <div class="panel-title">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 3.84c.64-.78 1.08-1.86.96-2.95-1 .04-2.14.65-2.78 1.4-.56.65-1.05 1.77-.92 2.82 1.12.09 2.15-.55 2.74-1.27z"/></svg>
+                                    <span>macOS Sender</span>
+                                </div>
+                                <span class="panel-badge">192.168.1.45:8080</span>
+                            </div>
+                            <div class="screen-placeholder">
+                                <div class="screen-overlay-top">
+                                    <div class="live-tag">
+                                        <span class="pulse-dot"></span>
+                                        <span>LIVE BROADCAST</span>
+                                    </div>
+                                    <div class="status-pill">1080p60 • H.264</div>
+                                </div>
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: #71717a;"><path d="M23 7l-7 5 7 5V7z"></path><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                                <span style="font-size: 0.8rem; color: #a1a1aa; margin-top: 8px;">MacBook FaceTime HD Camera Active</span>
+                            </div>
+                            <div class="panel-footer">
+                                <span>Throughput: <strong>8.4 Mbps</strong></span>
+                                <span>Clients: <strong>1 Active</strong></span>
+                            </div>
+                        </div>
+
+                        <!-- Windows Receiver Mockup -->
+                        <div class="mockup-panel">
+                            <div class="panel-header">
+                                <div class="panel-title">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+                                    <span>Windows 11 Receiver</span>
+                                </div>
+                                <span class="panel-badge" style="color: #22c55e;">Direct Webcam Active</span>
+                            </div>
+                            <div class="screen-placeholder">
+                                <div class="screen-overlay-top">
+                                    <div class="live-tag">
+                                        <span class="pulse-dot"></span>
+                                        <span>RECEIVING STREAM</span>
+                                    </div>
+                                    <div class="status-pill">WebCodecs GPU</div>
+                                </div>
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: #71717a;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                                <span style="font-size: 0.8rem; color: #a1a1aa; margin-top: 8px;">"MacCam Bridge Camera" exposed to System</span>
+                            </div>
+                            <div class="panel-footer">
+                                <span>FPS: <strong>60.0</strong></span>
+                                <span>Latency: <strong>3.2 ms</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Direct Downloads Section -->
+    <section id="downloads" class="download-section">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Direct Downloads</div>
+                <h2 class="section-title">Get MacCam Bridge for your devices</h2>
+                <p class="section-subtitle">Download the native macOS sender app and Windows 10/11 receivers directly from official GitHub releases.</p>
+            </div>
+
+            <div class="download-grid">
+                <!-- macOS Card -->
+                <div class="download-card">
+                    <div class="card-top">
+                        <div class="card-os-icon">
+                            <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 3.84c.64-.78 1.08-1.86.96-2.95-1 .04-2.14.65-2.78 1.4-.56.65-1.05 1.77-.92 2.82 1.12.09 2.15-.55 2.74-1.27z"/></svg>
+                        </div>
+                        <h3 class="card-title">macOS Sender App</h3>
+                        <p class="card-desc">For MacBook, Mac mini, Mac Studio & iMac. Native Swift app with VideoToolbox hardware H.264 engine.</p>
+                        <ul class="card-features">
+                            <li><svg viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg> Apple Silicon (M1/M2/M3/M4) & Intel</li>
+                            <li><svg viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg> macOS 14.0 Sonoma & macOS 15 Sequoia</li>
+                            <li><svg viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg> Auto-Bonjour Camera Broadcast</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <a id="btn-download-mac" href="https://github.com/somyacodes07/maccambridge/releases/latest" class="btn-card-download">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            Download macOS .dmg
+                        </a>
+                        <div class="card-meta">MacCamBridge-macOS.dmg</div>
+                    </div>
+                </div>
+
+                <!-- Windows Installer Card -->
+                <div class="download-card">
+                    <div class="card-top">
+                        <div class="card-os-icon">
+                            <svg viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+                        </div>
+                        <h3 class="card-title">Windows 11/10 Setup</h3>
+                        <p class="card-desc">Complete installer wizard for Windows PCs with virtual webcam driver and tray support.</p>
+                        <ul class="card-features">
+                            <li><svg viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg> Direct OBS / Discord / Zoom Device</li>
+                            <li><svg viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg> Hardware WebCodecs GPU Decoding</li>
+                            <li><svg viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg> Windows 11 & Windows 10 (64-bit)</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <a id="btn-download-win" href="https://github.com/somyacodes07/maccambridge/releases/latest" class="btn-card-download">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            Download Windows .exe
+                        </a>
+                        <div class="card-meta">MacCam-Bridge-Setup-Windows-x64.exe</div>
+                    </div>
+                </div>
+
+                <!-- Windows Portable Card -->
+                <div class="download-card">
+                    <div class="card-top">
+                        <div class="card-os-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+                        </div>
+                        <h3 class="card-title">Windows Portable EXE</h3>
+                        <p class="card-desc">Zero-install standalone executable. Run directly from USB drive or desktop without administrative installation.</p>
+                        <ul class="card-features">
+                            <li><svg viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg> No Administrative Rights Required</li>
+                            <li><svg viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg> Portable USB / Desktop Run</li>
+                            <li><svg viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg> Full Virtual Camera Capabilities</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <a id="btn-download-portable" href="https://github.com/somyacodes07/maccambridge/releases/latest" class="btn-card-download secondary-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            Download Portable EXE
+                        </a>
+                        <div class="card-meta">MacCam-Bridge-Portable-Windows-x64.exe</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- First-Launch Security Bypass Guide -->
+    <section id="bypass-guide" class="bypass-section">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">Security &amp; First Launch</div>
+                <h2 class="section-title">How to Open on macOS &amp; Windows</h2>
+                <p class="section-subtitle">Since MacCam Bridge is open-source and free, OS security prompts will appear on first launch. Here is how to bypass them in 5 seconds.</p>
+            </div>
+
+            <div class="guide-box">
+                <div class="guide-tabs">
+                    <div class="guide-tab active" onclick="switchTab('mac')">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 3.84c.64-.78 1.08-1.86.96-2.95-1 .04-2.14.65-2.78 1.4-.56.65-1.05 1.77-.92 2.82 1.12.09 2.15-.55 2.74-1.27z"/></svg>
+                        macOS Gatekeeper Bypass
+                    </div>
+                    <div class="guide-tab" onclick="switchTab('win')">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+                        Windows SmartScreen Bypass
+                    </div>
+                </div>
+
+                <!-- macOS Guide Content -->
+                <div id="guide-mac" class="guide-content active">
+                    <div class="guide-step">
+                        <div class="step-num">1</div>
+                        <div class="step-info">
+                            <h4>Method A: Right-Click "Open" (Recommended)</h4>
+                            <p>In your <strong>Applications</strong> folder, <strong>Right-Click (or Control + Click)</strong> on <code>MacCamBridge.app</code> and click <strong>Open</strong> from the context menu.</p>
+                            <p>On the dialog saying <em>"Apple cannot check it for malicious software"</em>, click <strong>Open</strong>.</p>
+                        </div>
+                    </div>
+
+                    <div class="guide-step">
+                        <div class="step-num">2</div>
+                        <div class="step-info">
+                            <h4>Method B: System Settings</h4>
+                            <p>Go to <strong>Apple Menu () → System Settings → Privacy & Security</strong>. Scroll down to the <strong>Security</strong> section, and click <strong>"Open Anyway"</strong> next to the blocked MacCamBridge notification.</p>
+                        </div>
+                    </div>
+
+                    <div class="guide-step" style="margin-bottom: 0;">
+                        <div class="step-num">3</div>
+                        <div class="step-info">
+                            <h4>Method C: Instant Terminal Command</h4>
+                            <p>Remove the quarantine flag with a single terminal command:</p>
+                            <div class="terminal-block">
+                                <code>xattr -cr /Applications/MacCamBridge.app</code>
+                                <button class="copy-btn" onclick="copyCode(this, 'xattr -cr /Applications/MacCamBridge.app')">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Windows Guide Content -->
+                <div id="guide-win" class="guide-content">
+                    <div class="guide-step">
+                        <div class="step-num">1</div>
+                        <div class="step-info">
+                            <h4>Click "More info" on Blue SmartScreen Banner</h4>
+                            <p>When launching the installer or portable EXE, Windows SmartScreen will show a blue dialog saying <em>"Windows protected your PC"</em>.</p>
+                            <p>Click the underlined link labeled <strong>"More info"</strong>.</p>
+                        </div>
+                    </div>
+
+                    <div class="guide-step" style="margin-bottom: 0;">
+                        <div class="step-num">2</div>
+                        <div class="step-info">
+                            <h4>Click "Run anyway"</h4>
+                            <p>A new button labeled <strong>"Run anyway"</strong> will appear in the bottom right corner. Click it to launch MacCam Bridge Receiver.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Grid Section -->
+    <section id="features" class="features-section">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">High-Performance Architecture</div>
+                <h2 class="section-title">Engineered for Studio Quality</h2>
+                <p class="section-subtitle">Built with native hardware acceleration pipelines on both macOS and Windows for lowest latency and zero dropped frames.</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+                    </div>
+                    <h3 class="feature-title">Sub-5ms Latency</h3>
+                    <p class="feature-desc">Apple VideoToolbox zero-copy hardware encoding paired with Chromium WebCodecs GPU decoding eliminates audio/video desync.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+                    </div>
+                    <h3 class="feature-title">USB-C Direct Link</h3>
+                    <p class="feature-desc">Connect a USB-C to USB-C cable between Mac and PC. Uses high-bandwidth link-local IP (169.254.x.x) for zero Wi-Fi congestion.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+                    </div>
+                    <h3 class="feature-title">Native System Webcam</h3>
+                    <p class="feature-desc">Appears directly as "MacCam Bridge Camera" in Windows Device Manager. Compatible with Discord, Zoom, OBS Studio, and MS Teams.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 16.1A5 5 0 0 1 5.9 20M2 12.05A9 9 0 0 1 9.95 20M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"></path><line x1="2" y1="20" x2="2.01" y2="20"></line></svg>
+                    </div>
+                    <h3 class="feature-title">Zero Config Bonjour</h3>
+                    <p class="feature-desc">Automatically discovers Mac camera broadcasters across your local network without manual IP configuration.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    </div>
+                    <h3 class="feature-title">Continuity Camera 4K</h3>
+                    <p class="feature-desc">Supports iPhone Continuity Camera connected to your Mac, giving your Windows PC a 4K Sony-grade studio sensor.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    </div>
+                    <h3 class="feature-title">100% Private &amp; Local</h3>
+                    <p class="feature-desc">Direct peer-to-peer streaming over TCP/WebSocket. No third-party servers, cloud relays, or internet traffic.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container footer-inner">
+            <div>
+                © 2026 MacCam Bridge. Open-source under MIT License.
+            </div>
+            <div class="footer-links">
+                <a href="https://github.com/somyacodes07/maccambridge" target="_blank">GitHub Repository</a>
+                <a href="https://github.com/somyacodes07/maccambridge/releases" target="_blank">Releases</a>
+                <a href="#bypass-guide">Security Guide</a>
+                <a href="#downloads">Download</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive Scripts -->
+    <script>
+        function switchTab(os) {
+            document.querySelectorAll('.guide-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.guide-content').forEach(c => c.classList.remove('active'));
+            
+            if (os === 'mac') {
+                document.querySelectorAll('.guide-tab')[0].classList.add('active');
+                document.getElementById('guide-mac').classList.add('active');
+            } else {
+                document.querySelectorAll('.guide-tab')[1].classList.add('active');
+                document.getElementById('guide-win').classList.add('active');
+            }
+        }
+
+        function copyCode(btn, text) {
+            navigator.clipboard.writeText(text);
+            const original = btn.innerText;
+            btn.innerText = 'Copied!';
+            setTimeout(() => {
+                btn.innerText = original;
+            }, 2000);
+        }
+
+        // Fetch latest release asset links from GitHub API
+        async function fetchLatestReleaseAssets() {
+            try {
+                const res = await fetch('https://api.github.com/repos/somyacodes07/maccambridge/releases/latest');
+                if (!res.ok) return;
+                const release = await res.json();
+                
+                if (release.assets && release.assets.length > 0) {
+                    for (const asset of release.assets) {
+                        const name = asset.name.toLowerCase();
+                        if (name.endsWith('.dmg')) {
+                            const macBtn = document.getElementById('btn-download-mac');
+                            if (macBtn) macBtn.href = asset.browser_download_url;
+                        } else if (name.includes('setup') && name.endsWith('.exe')) {
+                            const winBtn = document.getElementById('btn-download-win');
+                            if (winBtn) winBtn.href = asset.browser_download_url;
+                        } else if (name.includes('portable') && name.endsWith('.exe')) {
+                            const portBtn = document.getElementById('btn-download-portable');
+                            if (portBtn) portBtn.href = asset.browser_download_url;
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log('Using standard releases fallback URLs');
+            }
+        }
+
+        fetchLatestReleaseAssets();
+    </script>
+</body>
+</html>

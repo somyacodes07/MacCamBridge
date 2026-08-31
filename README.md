@@ -17,7 +17,7 @@
   <b>MacCam Bridge</b> transforms your MacBook camera into a high-definition, sub-5ms low-latency wireless & wired USB-C webcam for Windows 11 and macOS PCs.
 </p>
 
-[Download macOS DMG](https://github.com/somyacodes07/MacCamBridge/releases/latest) • [Download Windows Setup (.exe)](https://github.com/somyacodes07/MacCamBridge/releases/latest) • [Documentation](#-documentation)
+[🌐 Visit Official Website](https://somyacodes07.github.io/maccambridge/) • [Download macOS DMG](https://github.com/somyacodes07/MacCamBridge/releases/latest) • [Download Windows Setup (.exe)](https://github.com/somyacodes07/MacCamBridge/releases/latest) • [Documentation](#-documentation)
 
 ---
 
