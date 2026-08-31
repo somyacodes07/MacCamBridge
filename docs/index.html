@@ -4,7 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MacCam Bridge — Broadcast MacBook Camera to Windows at 1080p60 &lt;5ms</title>
-    <meta name="description" content="Turn your MacBook's Studio Quality FaceTime HD / Continuity Camera into an ultra-low latency direct webcam on Windows 10/11 over Wi-Fi or USB-C.">
+    <meta name="description" content="Turn your MacBook's Studio Quality FaceTime HD / Continuity Camera into an ultra-low latency direct webcam on Windows 10/11 over Wi-Fi or USB-C. Hardware accelerated VideoToolbox and WebCodecs pipeline.">
+    <meta name="keywords" content="MacCam Bridge, mac camera to windows, macbook continuity camera windows, mac virtual webcam windows, mac camera obs windows, low latency webcam, VideoToolbox webcam, 1080p60 webcam stream, mac to pc webcam, usb-c mac webcam windows, apple silicon webcam">
+    <meta name="author" content="somyacodes07">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#000000">
+    <link rel="canonical" href="https://somyacodes07.github.io/maccambridge/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://somyacodes07.github.io/maccambridge/">
+    <meta property="og:title" content="MacCam Bridge — Broadcast MacBook Camera to Windows at 1080p60 &lt;5ms">
+    <meta property="og:description" content="Turn your MacBook camera into a high-definition, sub-5ms low-latency wireless & USB-C virtual webcam on Windows 10/11.">
+    <meta property="og:image" content="https://somyacodes07.github.io/maccambridge/logo.png">
+    <meta property="og:site_name" content="MacCam Bridge">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://somyacodes07.github.io/maccambridge/">
+    <meta name="twitter:title" content="MacCam Bridge — Broadcast MacBook Camera to Windows">
+    <meta name="twitter:description" content="Turn your MacBook camera into an ultra-low latency direct virtual webcam on Windows 10/11 with VideoToolbox hardware acceleration.">
+    <meta name="twitter:image" content="https://somyacodes07.github.io/maccambridge/logo.png">
+
+    <!-- Schema.org SoftwareApplication JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "MacCam Bridge",
+      "operatingSystem": "macOS 14+, Windows 10, Windows 11",
+      "applicationCategory": "MultimediaApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      },
+      "description": "Studio-grade 1080p60 ultra-low latency webcam suite for macOS & Windows over Wi-Fi or USB-C.",
+      "url": "https://somyacodes07.github.io/maccambridge/",
+      "downloadUrl": "https://github.com/somyacodes07/maccambridge/releases/latest",
+      "author": {
+        "@type": "Person",
+        "name": "somyacodes07"
+      }
+    }
+    </script>
+
     <link rel="icon" type="image/svg+xml" href="logo.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,8 +67,14 @@
             --accent-white: #ffffff;
             --accent-glow: rgba(255, 255, 255, 0.12);
             --badge-green: #22c55e;
+            --badge-blue: #38bdf8;
             --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 88px;
         }
 
         * {
@@ -41,9 +91,21 @@
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             background-image: 
-                radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.07) 0%, transparent 60%),
-                radial-gradient(circle at 10% 40%, rgba(255, 255, 255, 0.03) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 40%);
+                radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 10% 35%, rgba(255, 255, 255, 0.02) 0%, transparent 40%),
+                radial-gradient(circle at 90% 65%, rgba(255, 255, 255, 0.02) 0%, transparent 40%);
+        }
+
+        /* Top Scroll Progress Bar */
+        #scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #52525b, #ffffff);
+            width: 0%;
+            z-index: 1000;
+            transition: width 0.1s ease-out;
         }
 
         a {
@@ -65,15 +127,16 @@
             z-index: 100;
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            background: rgba(9, 9, 11, 0.8);
+            background: rgba(9, 9, 11, 0.85);
             border-bottom: 1px solid var(--border-subtle);
+            transition: all 0.3s ease;
         }
 
         .nav-inner {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            height: 72px;
+            height: 70px;
         }
 
         .brand {
@@ -81,14 +144,14 @@
             align-items: center;
             gap: 12px;
             font-weight: 700;
-            font-size: 1.15rem;
+            font-size: 1.12rem;
             letter-spacing: -0.02em;
         }
 
         .brand-logo {
             width: 36px;
             height: 36px;
-            border-radius: 10px;
+            border-radius: 9px;
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
             padding: 4px;
@@ -165,9 +228,16 @@
 
         /* Hero Section */
         .hero {
-            padding: 90px 0 60px;
+            padding: 80px 0 50px;
             text-align: center;
             position: relative;
+        }
+
+        .hero-badge-container {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
         }
 
         .pill-badge {
@@ -178,9 +248,8 @@
             border-radius: 9999px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border-highlight);
-            font-size: 0.8rem;
+            font-size: 0.82rem;
             font-weight: 600;
-            margin-bottom: 24px;
             backdrop-filter: blur(10px);
         }
 
@@ -200,17 +269,18 @@
         }
 
         .hero h1 {
-            font-size: clamp(2.5rem, 5vw, 4.2rem);
+            font-size: clamp(2.4rem, 4.8vw, 3.8rem);
             font-weight: 800;
-            line-height: 1.1;
+            line-height: 1.15;
             letter-spacing: -0.03em;
             margin-bottom: 20px;
-            max-width: 900px;
+            max-width: 880px;
             margin-left: auto;
             margin-right: auto;
+            text-wrap: balance;
         }
 
-        .hero h1 span {
+        .hero h1 span.glow-accent {
             background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 100%);
             -webkit-background-clip: text;
             background-clip: text;
@@ -218,9 +288,9 @@
         }
 
         .hero p {
-            font-size: 1.15rem;
+            font-size: 1.12rem;
             color: var(--text-secondary);
-            max-width: 680px;
+            max-width: 660px;
             margin: 0 auto 36px;
             line-height: 1.6;
         }
@@ -231,14 +301,14 @@
             justify-content: center;
             gap: 16px;
             flex-wrap: wrap;
-            margin-bottom: 50px;
+            margin-bottom: 36px;
         }
 
         .btn-primary {
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            padding: 14px 28px;
+            padding: 14px 30px;
             background: #ffffff;
             color: #000000;
             font-weight: 700;
@@ -274,11 +344,31 @@
             transform: translateY(-2px);
         }
 
-        /* Metric Badges */
+        /* Hero Terminal Quick Bypass Pill */
+        .hero-terminal-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(18, 18, 21, 0.8);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 8px 16px;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin-bottom: 48px;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-terminal-pill code {
+            color: #ffffff;
+        }
+
+        /* Metric Bar */
         .metric-bar {
             display: flex;
             justify-content: center;
-            gap: 24px;
+            gap: 16px;
             flex-wrap: wrap;
             margin-bottom: 60px;
         }
@@ -302,13 +392,14 @@
 
         /* App Preview Mockup Window */
         .preview-window {
-            max-width: 960px;
-            margin: 0 auto 100px;
+            max-width: 1000px;
+            margin: 0 auto 90px;
             background: var(--bg-surface);
             border: 1px solid var(--border-highlight);
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 40px rgba(255, 255, 255, 0.04);
+            text-align: left;
         }
 
         .window-header {
@@ -336,23 +427,26 @@
         .dot-green { background: #27c93f; }
 
         .window-title {
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             color: var(--text-muted);
             font-family: var(--font-mono);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .window-body {
-            padding: 24px;
+            padding: 20px;
             background: #000000;
         }
 
         .mockup-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 18px;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 840px) {
             .mockup-grid {
                 grid-template-columns: 1fr;
             }
@@ -362,10 +456,10 @@
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
             border-radius: 14px;
-            padding: 20px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 14px;
         }
 
         .panel-header {
@@ -379,68 +473,174 @@
             align-items: center;
             gap: 10px;
             font-weight: 700;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
         }
 
         .panel-badge {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             font-family: var(--font-mono);
-            padding: 4px 10px;
+            padding: 3px 8px;
             background: rgba(255, 255, 255, 0.08);
             border-radius: 6px;
             color: var(--text-secondary);
         }
 
-        .screen-placeholder {
-            height: 220px;
-            background: #000000;
-            border: 1px solid var(--border-subtle);
+        /* Studio Video Canvas Simulation */
+        .studio-canvas {
+            height: 240px;
             border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 12px;
+            border: 1px solid var(--border-subtle);
+            background: 
+                radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.08) 0%, transparent 60%),
+                linear-gradient(180deg, #18181b 0%, #09090b 100%);
+        }
+
+        .studio-canvas::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 16px 16px;
+            pointer-events: none;
+        }
+
+        .canvas-overlay-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .badge-live {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            font-size: 0.72rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            color: #ffffff;
+        }
+
+        .badge-spec {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid var(--border-subtle);
+            font-size: 0.72rem;
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+        }
+
+        .canvas-center {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            position: relative;
-            overflow: hidden;
+            z-index: 2;
+            gap: 8px;
         }
 
-        .screen-overlay-top {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            right: 10px;
+        .camera-silhouette {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            font-size: 0.75rem;
+            justify-content: center;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.05);
+        }
+
+        .camera-silhouette svg {
+            width: 32px;
+            height: 32px;
+            fill: #a1a1aa;
+        }
+
+        .camera-caption {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .camera-subcaption {
+            font-size: 0.72rem;
+            color: var(--text-muted);
             font-family: var(--font-mono);
         }
 
-        .live-tag {
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid var(--border-subtle);
+        .canvas-overlay-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .audio-wave {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 16px;
             padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.75);
             border-radius: 6px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .wave-bar {
+            width: 3px;
+            background: #ffffff;
+            border-radius: 2px;
+            animation: wave 1.2s ease-in-out infinite alternate;
+        }
+
+        .wave-bar:nth-child(1) { height: 40%; animation-delay: 0.1s; }
+        .wave-bar:nth-child(2) { height: 80%; animation-delay: 0.3s; }
+        .wave-bar:nth-child(3) { height: 100%; animation-delay: 0.15s; }
+        .wave-bar:nth-child(4) { height: 60%; animation-delay: 0.4s; }
+
+        @keyframes wave {
+            0% { height: 25%; opacity: 0.4; }
+            100% { height: 100%; opacity: 1; }
+        }
+
+        /* Panel Status Row */
+        .panel-status-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            font-size: 0.78rem;
+            font-family: var(--font-mono);
+        }
+
+        .status-pill-subtle {
             display: flex;
             align-items: center;
             gap: 6px;
-        }
-
-        .status-pill {
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid var(--border-subtle);
-            padding: 4px 8px;
-            border-radius: 6px;
             color: var(--text-secondary);
         }
 
-        .panel-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            font-family: var(--font-mono);
+        .status-pill-subtle strong {
+            color: #ffffff;
         }
 
         /* Section Titles */
@@ -452,7 +652,7 @@
         .section-tag {
             font-size: 0.8rem;
             font-weight: 700;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.12em;
             text-transform: uppercase;
             color: var(--text-muted);
             margin-bottom: 12px;
@@ -461,20 +661,20 @@
         .section-title {
             font-size: clamp(2rem, 3.5vw, 2.8rem);
             font-weight: 800;
-            letter-spacing: -0.02em;
+            letter-spacing: -0.025em;
             margin-bottom: 16px;
         }
 
         .section-subtitle {
             font-size: 1.05rem;
             color: var(--text-secondary);
-            max-width: 600px;
+            max-width: 620px;
             margin: 0 auto;
         }
 
         /* Download Section */
         .download-section {
-            padding: 80px 0;
+            padding: 90px 0;
             background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
         }
 
@@ -707,7 +907,7 @@
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid var(--border-subtle);
             color: #ffffff;
-            padding: 5px 10px;
+            padding: 5px 12px;
             border-radius: 6px;
             font-size: 0.75rem;
             cursor: pointer;
@@ -775,6 +975,39 @@
             line-height: 1.6;
         }
 
+        /* Floating Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-highlight);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.25s ease;
+            z-index: 99;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .back-to-top:hover {
+            background: #ffffff;
+            color: #000000;
+            transform: translateY(-3px);
+        }
+
         /* Footer */
         footer {
             border-top: 1px solid var(--border-subtle);
@@ -804,6 +1037,9 @@
 </head>
 <body>
 
+    <!-- Scroll Progress Indicator -->
+    <div id="scroll-progress"></div>
+
     <!-- Header Navigation -->
     <header>
         <div class="container nav-inner">
@@ -831,17 +1067,19 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
+    <!-- Refined Hero Section -->
     <section class="hero">
         <div class="container">
-            <div class="pill-badge">
-                <span class="pulse-dot"></span>
-                <span>Open Source • Ultra-Low Latency Video Bridge</span>
+            <div class="hero-badge-container">
+                <div class="pill-badge">
+                    <span class="pulse-dot"></span>
+                    <span>v1.0.0 Stable Release • Ultra-Low Latency Pipeline</span>
+                </div>
             </div>
 
             <h1>
-                Broadcast your Mac Camera to<br>
-                <span>Windows 10/11 at 1080p60 &lt;5ms.</span>
+                Broadcast your Mac Camera to Windows<br>
+                <span class="glow-accent">at 1080p60 with &lt;5ms latency.</span>
             </h1>
 
             <p>
@@ -859,9 +1097,19 @@
                 </a>
             </div>
 
+            <!-- Quick Terminal Bypass Pill -->
+            <div>
+                <div class="hero-terminal-pill">
+                    <span>⚡ macOS First Launch:</span>
+                    <code>xattr -cr /Applications/MacCamBridge.app</code>
+                    <button class="copy-btn" onclick="copyCode(this, 'xattr -cr /Applications/MacCamBridge.app')">Copy</button>
+                </div>
+            </div>
+
+            <!-- High-Impact Live Metrics -->
             <div class="metric-bar">
                 <div class="metric-item">
-                    <span>Latency:</span>
+                    <span>Pipeline Latency:</span>
                     <strong>&lt; 5ms (Sub-frame)</strong>
                 </div>
                 <div class="metric-item">
@@ -870,7 +1118,7 @@
                 </div>
                 <div class="metric-item">
                     <span>Wired Link:</span>
-                    <strong>40 Gbps USB-C Thunderbolt</strong>
+                    <strong>40 Gbps Thunderbolt USB-C</strong>
                 </div>
                 <div class="metric-item">
                     <span>Apps Supported:</span>
@@ -878,7 +1126,7 @@
                 </div>
             </div>
 
-            <!-- Interactive App Preview Window -->
+            <!-- High-Fidelity App Showcase Preview -->
             <div class="preview-window">
                 <div class="window-header">
                     <div class="window-dots">
@@ -886,60 +1134,106 @@
                         <span class="dot dot-yellow"></span>
                         <span class="dot dot-green"></span>
                     </div>
-                    <div class="window-title">MacCam Bridge — Studio Broadcast Pipeline</div>
-                    <div style="width: 40px;"></div>
+                    <div class="window-title">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+                        <span>MacCam Bridge — Studio Broadcast Pipeline</span>
+                    </div>
+                    <div style="font-size: 0.75rem; font-family: var(--font-mono); color: #22c55e;">● SYSTEM ACTIVE</div>
                 </div>
                 <div class="window-body">
                     <div class="mockup-grid">
-                        <!-- macOS Sender Mockup -->
+                        <!-- macOS Sender Studio -->
                         <div class="mockup-panel">
                             <div class="panel-header">
                                 <div class="panel-title">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 3.84c.64-.78 1.08-1.86.96-2.95-1 .04-2.14.65-2.78 1.4-.56.65-1.05 1.77-.92 2.82 1.12.09 2.15-.55 2.74-1.27z"/></svg>
-                                    <span>macOS Sender</span>
+                                    <span>macOS Broadcaster Studio</span>
                                 </div>
                                 <span class="panel-badge">192.168.1.45:8080</span>
                             </div>
-                            <div class="screen-placeholder">
-                                <div class="screen-overlay-top">
-                                    <div class="live-tag">
+
+                            <div class="studio-canvas">
+                                <div class="canvas-overlay-top">
+                                    <div class="badge-live">
                                         <span class="pulse-dot"></span>
                                         <span>LIVE BROADCAST</span>
                                     </div>
-                                    <div class="status-pill">1080p60 • H.264</div>
+                                    <div class="badge-spec">1080p60 • 8.5 Mbps</div>
                                 </div>
-                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: #71717a;"><path d="M23 7l-7 5 7 5V7z"></path><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
-                                <span style="font-size: 0.8rem; color: #a1a1aa; margin-top: 8px;">MacBook FaceTime HD Camera Active</span>
+
+                                <div class="canvas-center">
+                                    <div class="camera-silhouette">
+                                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                                    </div>
+                                    <div class="camera-caption">FaceTime HD / Continuity Camera</div>
+                                    <div class="camera-subcaption">VideoToolbox NV12 GPU Encoding</div>
+                                </div>
+
+                                <div class="canvas-overlay-bottom">
+                                    <div class="audio-wave">
+                                        <div class="wave-bar"></div>
+                                        <div class="wave-bar"></div>
+                                        <div class="wave-bar"></div>
+                                        <div class="wave-bar"></div>
+                                    </div>
+                                    <div class="badge-spec">Keyframe Interval: 1.0s</div>
+                                </div>
                             </div>
-                            <div class="panel-footer">
-                                <span>Throughput: <strong>8.4 Mbps</strong></span>
-                                <span>Clients: <strong>1 Active</strong></span>
+
+                            <div class="panel-status-row">
+                                <div class="status-pill-subtle">
+                                    <span>Wi-Fi:</span>
+                                    <strong>192.168.1.45:8080</strong>
+                                </div>
+                                <div class="status-pill-subtle">
+                                    <span>USB-C:</span>
+                                    <strong>169.254.12.80:8080</strong>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Windows Receiver Mockup -->
+                        <!-- Windows Receiver Studio -->
                         <div class="mockup-panel">
                             <div class="panel-header">
                                 <div class="panel-title">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
-                                    <span>Windows 11 Receiver</span>
+                                    <span>Windows 11 Receiver Studio</span>
                                 </div>
                                 <span class="panel-badge" style="color: #22c55e;">Direct Webcam Active</span>
                             </div>
-                            <div class="screen-placeholder">
-                                <div class="screen-overlay-top">
-                                    <div class="live-tag">
-                                        <span class="pulse-dot"></span>
-                                        <span>RECEIVING STREAM</span>
+
+                            <div class="studio-canvas">
+                                <div class="canvas-overlay-top">
+                                    <div class="badge-live" style="border-color: rgba(56, 189, 248, 0.3);">
+                                        <span class="pulse-dot" style="background: var(--badge-blue); box-shadow: 0 0 10px var(--badge-blue);"></span>
+                                        <span>STREAM SYNCED</span>
                                     </div>
-                                    <div class="status-pill">WebCodecs GPU</div>
+                                    <div class="badge-spec">WebCodecs GPU • 60 FPS</div>
                                 </div>
-                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: #71717a;"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-                                <span style="font-size: 0.8rem; color: #a1a1aa; margin-top: 8px;">"MacCam Bridge Camera" exposed to System</span>
+
+                                <div class="canvas-center">
+                                    <div class="camera-silhouette" style="border-color: rgba(34, 197, 94, 0.3);">
+                                        <svg viewBox="0 0 24 24" style="fill: #22c55e;"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+                                    </div>
+                                    <div class="camera-caption">"MacCam Bridge Camera"</div>
+                                    <div class="camera-subcaption" style="color: #22c55e;">Streaming to Discord, OBS &amp; Zoom</div>
+                                </div>
+
+                                <div class="canvas-overlay-bottom">
+                                    <div class="badge-spec">Latency: <strong style="color: #ffffff;">3.2 ms</strong></div>
+                                    <div class="badge-spec">Dropped: <strong style="color: #22c55e;">0 (0.0%)</strong></div>
+                                </div>
                             </div>
-                            <div class="panel-footer">
-                                <span>FPS: <strong>60.0</strong></span>
-                                <span>Latency: <strong>3.2 ms</strong></span>
+
+                            <div class="panel-status-row">
+                                <div class="status-pill-subtle">
+                                    <span>Driver:</span>
+                                    <strong style="color: #22c55e;">Direct Virtual Camera</strong>
+                                </div>
+                                <div class="status-pill-subtle">
+                                    <span>Protocol:</span>
+                                    <strong>MCB1 Binary TCP</strong>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1150,7 +1444,7 @@
 
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                     </div>
                     <h3 class="feature-title">Continuity Camera 4K</h3>
                     <p class="feature-desc">Supports iPhone Continuity Camera connected to your Mac, giving your Windows PC a 4K Sony-grade studio sensor.</p>
@@ -1166,6 +1460,11 @@
             </div>
         </div>
     </section>
+
+    <!-- Floating Back to Top Button -->
+    <div id="back-to-top" class="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" title="Back to Top">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15l-6-6-6 6"></path></svg>
+    </div>
 
     <!-- Footer -->
     <footer>
@@ -1184,6 +1483,24 @@
 
     <!-- Interactive Scripts -->
     <script>
+        // Smooth scroll progress bar & Back to top button visibility
+        window.addEventListener('scroll', () => {
+            const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            const progressBar = document.getElementById('scroll-progress');
+            if (progressBar) progressBar.style.width = scrolled + '%';
+
+            const backToTop = document.getElementById('back-to-top');
+            if (backToTop) {
+                if (winScroll > 400) {
+                    backToTop.classList.add('visible');
+                } else {
+                    backToTop.classList.remove('visible');
+                }
+            }
+        });
+
         function switchTab(os) {
             document.querySelectorAll('.guide-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.guide-content').forEach(c => c.classList.remove('active'));

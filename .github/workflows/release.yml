@@ -214,7 +214,6 @@ jobs:
     name: Deploy Website to GitHub Pages
     needs: [prepare-version]
     runs-on: ubuntu-latest
-    environment: github-pages
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
