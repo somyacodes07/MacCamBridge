@@ -1,11 +1,9 @@
-name: Release & Deploy Website
+name: Build & Publish Release
 
 on:
   push:
     tags:
       - 'v*'
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       version:
@@ -19,8 +17,6 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -35,7 +31,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.calc_version.outputs.version }}
-      is_release: ${{ steps.calc_version.outputs.is_release }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -45,39 +40,29 @@ jobs:
       - name: Calculate Semantic Version
         id: calc_version
         run: |
-          IS_RELEASE="false"
           if [ "${{ github.ref_type }}" = "tag" ]; then
             VERSION="${{ github.ref_name }}"
-            IS_RELEASE="true"
-          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            IS_RELEASE="true"
-            if [ -n "${{ github.event.inputs.version }}" ]; then
-              VERSION="${{ github.event.inputs.version }}"
-              if [[ ! "$VERSION" =~ ^v ]]; then
-                VERSION="v$VERSION"
-              fi
-            else
-              LATEST_TAG=$(git tag -l "v*" --sort=-v:refname | head -n 1)
-              if [ -n "$LATEST_TAG" ]; then
-                BASE_VER=${LATEST_TAG#v}
-                MAJOR=$(echo "$BASE_VER" | cut -d. -f1)
-                MINOR=$(echo "$BASE_VER" | cut -d. -f2)
-                PATCH=$(echo "$BASE_VER" | cut -d. -f3)
-                NEXT_PATCH=$((PATCH + 1))
-                VERSION="v${MAJOR}.${MINOR}.${NEXT_PATCH}"
-              else
-                VERSION="v1.0.${{ github.run_number }}"
-              fi
+          elif [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+            if [[ ! "$VERSION" =~ ^v ]]; then
+              VERSION="v$VERSION"
             fi
           else
-            # Push to main branch (CD build / website deployment)
             LATEST_TAG=$(git tag -l "v*" --sort=-v:refname | head -n 1)
-            VERSION="${LATEST_TAG:-v1.0.0}"
+            if [ -n "$LATEST_TAG" ]; then
+              BASE_VER=${LATEST_TAG#v}
+              MAJOR=$(echo "$BASE_VER" | cut -d. -f1)
+              MINOR=$(echo "$BASE_VER" | cut -d. -f2)
+              PATCH=$(echo "$BASE_VER" | cut -d. -f3)
+              NEXT_PATCH=$((PATCH + 1))
+              VERSION="v${MAJOR}.${MINOR}.${NEXT_PATCH}"
+            else
+              VERSION="v1.0.${{ github.run_number }}"
+            fi
           fi
 
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "is_release=$IS_RELEASE" >> "$GITHUB_OUTPUT"
-          echo "Determined Version: $VERSION (Create Release: $IS_RELEASE)"
+          echo "Determined Version: $VERSION"
 
   # -------------------------------------------------------------
   # Build macOS Release DMG
@@ -139,12 +124,11 @@ jobs:
           if-no-files-found: error
 
   # -------------------------------------------------------------
-  # Publish Official GitHub Release (On Tag or Workflow Dispatch)
+  # Publish Official GitHub Release
   # -------------------------------------------------------------
   publish-release:
     name: Publish Official GitHub Release
     needs: [prepare-version, build-macos, build-windows]
-    if: needs.prepare-version.outputs.is_release == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -206,26 +190,3 @@ jobs:
             - **Zero Config Bonjour Discovery**: Instantly connects over local Wi-Fi.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # -------------------------------------------------------------
-  # Deploy Documentation Website to GitHub Pages
-  # -------------------------------------------------------------
-  deploy-pages:
-    name: Deploy Website to GitHub Pages
-    needs: [prepare-version]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Setup GitHub Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: 'docs'
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
